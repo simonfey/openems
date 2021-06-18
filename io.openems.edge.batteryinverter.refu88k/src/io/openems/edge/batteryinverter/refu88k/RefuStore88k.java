@@ -128,7 +128,7 @@ public interface RefuStore88k
 	 * 
 	 */
 	public default void exitStandbyMode() throws OpenemsNamedException {
-		EnumWriteChannel pcsSetOperation = this.channel(RefuStore88kChannelId.PCS_SET_OPERATION);
+		EnumWriteChannel pcsSetOperation = this.channel(RefuStore100kChannelId.PCS_SET_OPERATION);
 		pcsSetOperation.setNextWriteValue(PCSSetOperation.EXIT_STANDBY_MODE);
 	}
 
@@ -140,7 +140,7 @@ public interface RefuStore88k
 	 * 
 	 */
 	public default void enterStartedMode() throws OpenemsNamedException {
-		EnumWriteChannel pcsSetOperation = this.channel(RefuStore88kChannelId.PCS_SET_OPERATION);
+		EnumWriteChannel pcsSetOperation = this.channel(RefuStore100kChannelId.PCS_SET_OPERATION);
 		pcsSetOperation.setNextWriteValue(PCSSetOperation.STOP_PCS);
 	}
 
@@ -152,7 +152,7 @@ public interface RefuStore88k
 	 * 
 	 */
 	public default void enterThrottledMpptMode() throws OpenemsNamedException {
-		EnumWriteChannel pcsSetOperation = this.channel(RefuStore88kChannelId.PCS_SET_OPERATION);
+		EnumWriteChannel pcsSetOperation = this.channel(RefuStore100kChannelId.PCS_SET_OPERATION);
 		pcsSetOperation.setNextWriteValue(PCSSetOperation.START_PCS);
 	}
 
@@ -164,32 +164,32 @@ public interface RefuStore88k
 	 * 
 	 */
 	public default void stopInverter() throws OpenemsNamedException {
-		EnumWriteChannel pcsSetOperation = this.channel(RefuStore88kChannelId.PCS_SET_OPERATION);
+		EnumWriteChannel pcsSetOperation = this.channel(RefuStore100kChannelId.PCS_SET_OPERATION);
 		pcsSetOperation.setNextWriteValue(PCSSetOperation.ENTER_STANDBY_MODE);
 	}
 
 	public default String getSerialNumber() {
-		return this.channel(RefuStore88kChannelId.SN).value().asString();
+		return this.channel(RefuStore100kChannelId.SN).value().asString();
 	}
 
 	public default Channel<Integer> getDcVoltage() {
-		return this.channel(RefuStore88kChannelId.DCV);
+		return this.channel(RefuStore100kChannelId.DCV);
 	}
 
 	public default Channel<Integer> getAcVoltage() {
-		return this.channel(RefuStore88kChannelId.PP_VPH_AB);
+		return this.channel(RefuStore100kChannelId.PP_VPH_AB);
 	}
 
 	public default Channel<Integer> getAcCurrent() {
-		return this.channel(RefuStore88kChannelId.A);
+		return this.channel(RefuStore100kChannelId.A);
 	}
 
 	public default Channel<Integer> getApparentPower() {
-		return this.channel(RefuStore88kChannelId.VA);
+		return this.channel(RefuStore100kChannelId.VA);
 	}
 
 	public default OperatingState getOperatingState() {
-		return this.channel(RefuStore88kChannelId.ST).value().asEnum();
+		return this.channel(RefuStore100kChannelId.ST).value().asEnum();
 	}
 
 }

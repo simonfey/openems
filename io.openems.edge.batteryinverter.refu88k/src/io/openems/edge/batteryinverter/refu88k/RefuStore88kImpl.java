@@ -99,7 +99,7 @@ public class RefuStore88kImpl extends AbstractOpenemsModbusComponent implements 
 				SymmetricBatteryInverter.ChannelId.values(), //
 				ManagedSymmetricBatteryInverter.ChannelId.values(), //
 				StartStoppable.ChannelId.values(), //
-				RefuStore88kChannelId.values() //
+				RefuStore100kChannelId.values() //
 		);
 		this._setGridMode(GridMode.ON_GRID);
 	}
@@ -123,7 +123,7 @@ public class RefuStore88kImpl extends AbstractOpenemsModbusComponent implements 
 				return;
 			}
 			MAX_APPARENT_POWER = valueOpt.get();
-			IntegerWriteChannel wMaxChannel = this.channel(RefuStore88kChannelId.W_MAX);
+			IntegerWriteChannel wMaxChannel = this.channel(RefuStore100kChannelId.W_MAX);
 			try {
 				// Set WMax
 				wMaxChannel.setNextWriteValue(MAX_APPARENT_POWER);
@@ -191,10 +191,10 @@ public class RefuStore88kImpl extends AbstractOpenemsModbusComponent implements 
 		int maxBatteryChargeValue = battery.getChargeMaxCurrent().orElse(0);
 		int maxBatteryDischargeValue = battery.getDischargeMaxCurrent().orElse(0);
 
-		IntegerWriteChannel maxBatAChaChannel = this.channel(RefuStore88kChannelId.MAX_BAT_A_CHA);
+		IntegerWriteChannel maxBatAChaChannel = this.channel(RefuStore100kChannelId.MAX_BAT_A_CHA);
 		maxBatAChaChannel.setNextWriteValue(maxBatteryChargeValue);
 
-		IntegerWriteChannel maxBatADischaChannel = this.channel(RefuStore88kChannelId.MAX_BAT_A_DISCHA);
+		IntegerWriteChannel maxBatADischaChannel = this.channel(RefuStore100kChannelId.MAX_BAT_A_DISCHA);
 		maxBatADischaChannel.setNextWriteValue(maxBatteryDischargeValue);
 	}
 
@@ -221,230 +221,230 @@ public class RefuStore88kImpl extends AbstractOpenemsModbusComponent implements 
 	protected ModbusProtocol defineModbusProtocol() throws OpenemsException { // Register
 		return new ModbusProtocol(this, //
 				new FC3ReadRegistersTask(SUNSPEC_1, Priority.ONCE, //
-						m(RefuStore88kChannelId.ID_1, new UnsignedWordElement(SUNSPEC_1)), // 40002
-						m(RefuStore88kChannelId.L_1, new UnsignedWordElement(SUNSPEC_1 + 1)), // 40003
-						m(RefuStore88kChannelId.MN, new StringWordElement(SUNSPEC_1 + 2, 16)), // 40004
-						m(RefuStore88kChannelId.MD, new StringWordElement(SUNSPEC_1 + 18, 16)), // 40020
-						m(RefuStore88kChannelId.OPT, new StringWordElement(SUNSPEC_1 + 34, 8)), // 40036
-						m(RefuStore88kChannelId.VR, new StringWordElement(SUNSPEC_1 + 42, 8)), // 40044
-						m(RefuStore88kChannelId.SN, new StringWordElement(SUNSPEC_1 + 50, 16)), // 40052
-						m(RefuStore88kChannelId.DA, new UnsignedWordElement(SUNSPEC_1 + 66)), // 40068
-						m(RefuStore88kChannelId.PAD_1, new UnsignedWordElement(SUNSPEC_1 + 67))), // 40069
+						m(RefuStore100kChannelId.ID_1, new UnsignedWordElement(SUNSPEC_1)), // 40002
+						m(RefuStore100kChannelId.L_1, new UnsignedWordElement(SUNSPEC_1 + 1)), // 40003
+						m(RefuStore100kChannelId.MN, new StringWordElement(SUNSPEC_1 + 2, 16)), // 40004
+						m(RefuStore100kChannelId.MD, new StringWordElement(SUNSPEC_1 + 18, 16)), // 40020
+						m(RefuStore100kChannelId.OPT, new StringWordElement(SUNSPEC_1 + 34, 8)), // 40036
+						m(RefuStore100kChannelId.VR, new StringWordElement(SUNSPEC_1 + 42, 8)), // 40044
+						m(RefuStore100kChannelId.SN, new StringWordElement(SUNSPEC_1 + 50, 16)), // 40052
+						m(RefuStore100kChannelId.DA, new UnsignedWordElement(SUNSPEC_1 + 66)), // 40068
+						m(RefuStore100kChannelId.PAD_1, new UnsignedWordElement(SUNSPEC_1 + 67))), // 40069
 
 				new FC3ReadRegistersTask(SUNSPEC_103, Priority.HIGH, //
-						m(RefuStore88kChannelId.ID_103, new UnsignedWordElement(SUNSPEC_103)), // 40070
-						m(RefuStore88kChannelId.L_103, new UnsignedWordElement(SUNSPEC_103 + 1)), // 40071
-						m(RefuStore88kChannelId.A, new UnsignedWordElement(SUNSPEC_103 + 2), // 40072
+						m(RefuStore100kChannelId.ID_103, new UnsignedWordElement(SUNSPEC_103)), // 40070
+						m(RefuStore100kChannelId.L_103, new UnsignedWordElement(SUNSPEC_103 + 1)), // 40071
+						m(RefuStore100kChannelId.A, new UnsignedWordElement(SUNSPEC_103 + 2), // 40072
 								ElementToChannelConverter.SCALE_FACTOR_MINUS_2),
-						m(RefuStore88kChannelId.APH_A, new UnsignedWordElement(SUNSPEC_103 + 3), // 40073
+						m(RefuStore100kChannelId.APH_A, new UnsignedWordElement(SUNSPEC_103 + 3), // 40073
 								ElementToChannelConverter.SCALE_FACTOR_MINUS_2),
-						m(RefuStore88kChannelId.APH_B, new UnsignedWordElement(SUNSPEC_103 + 4), // 40074
+						m(RefuStore100kChannelId.APH_B, new UnsignedWordElement(SUNSPEC_103 + 4), // 40074
 								ElementToChannelConverter.SCALE_FACTOR_MINUS_2),
-						m(RefuStore88kChannelId.APH_C, new UnsignedWordElement(SUNSPEC_103 + 5), // 40075
+						m(RefuStore100kChannelId.APH_C, new UnsignedWordElement(SUNSPEC_103 + 5), // 40075
 								ElementToChannelConverter.SCALE_FACTOR_MINUS_2),
-						m(RefuStore88kChannelId.A_SF, new UnsignedWordElement(SUNSPEC_103 + 6)), // 40076
-						m(RefuStore88kChannelId.PP_VPH_AB, new UnsignedWordElement(SUNSPEC_103 + 7), // 40077
+						m(RefuStore100kChannelId.A_SF, new UnsignedWordElement(SUNSPEC_103 + 6)), // 40076
+						m(RefuStore100kChannelId.PP_VPH_AB, new UnsignedWordElement(SUNSPEC_103 + 7), // 40077
 								ElementToChannelConverter.SCALE_FACTOR_MINUS_1),
-						m(RefuStore88kChannelId.PP_VPH_BC, new UnsignedWordElement(SUNSPEC_103 + 8), // 40078
+						m(RefuStore100kChannelId.PP_VPH_BC, new UnsignedWordElement(SUNSPEC_103 + 8), // 40078
 								ElementToChannelConverter.SCALE_FACTOR_MINUS_1),
-						m(RefuStore88kChannelId.PP_VPH_CA, new UnsignedWordElement(SUNSPEC_103 + 9), // 40079
+						m(RefuStore100kChannelId.PP_VPH_CA, new UnsignedWordElement(SUNSPEC_103 + 9), // 40079
 								ElementToChannelConverter.SCALE_FACTOR_MINUS_1),
-						m(RefuStore88kChannelId.PH_VPH_A, new UnsignedWordElement(SUNSPEC_103 + 10), // 40080
+						m(RefuStore100kChannelId.PH_VPH_A, new UnsignedWordElement(SUNSPEC_103 + 10), // 40080
 								ElementToChannelConverter.SCALE_FACTOR_MINUS_1),
-						m(RefuStore88kChannelId.PH_VPH_B, new UnsignedWordElement(SUNSPEC_103 + 11), // 40081
+						m(RefuStore100kChannelId.PH_VPH_B, new UnsignedWordElement(SUNSPEC_103 + 11), // 40081
 								ElementToChannelConverter.SCALE_FACTOR_MINUS_1),
-						m(RefuStore88kChannelId.PH_VPH_C, new UnsignedWordElement(SUNSPEC_103 + 12), // 40082
+						m(RefuStore100kChannelId.PH_VPH_C, new UnsignedWordElement(SUNSPEC_103 + 12), // 40082
 								ElementToChannelConverter.SCALE_FACTOR_MINUS_1),
-						m(RefuStore88kChannelId.V_SF, new UnsignedWordElement(SUNSPEC_103 + 13)), // 40083
+						m(RefuStore100kChannelId.V_SF, new UnsignedWordElement(SUNSPEC_103 + 13)), // 40083
 						m(SymmetricBatteryInverter.ChannelId.ACTIVE_POWER, new SignedWordElement(SUNSPEC_103 + 14), // 40084
 																													// //
 								ElementToChannelConverter.SCALE_FACTOR_1), // REFUStore88KChannelId.W//
-						m(RefuStore88kChannelId.W_SF, new SignedWordElement(SUNSPEC_103 + 15)), // 40085
-						m(RefuStore88kChannelId.HZ, new SignedWordElement(SUNSPEC_103 + 16), // 40086
+						m(RefuStore100kChannelId.W_SF, new SignedWordElement(SUNSPEC_103 + 15)), // 40085
+						m(RefuStore100kChannelId.HZ, new SignedWordElement(SUNSPEC_103 + 16), // 40086
 								ElementToChannelConverter.SCALE_FACTOR_MINUS_2),
-						m(RefuStore88kChannelId.HZ_SF, new SignedWordElement(SUNSPEC_103 + 17)), // 40087
-						m(RefuStore88kChannelId.VA, new SignedWordElement(SUNSPEC_103 + 18), // 40088
+						m(RefuStore100kChannelId.HZ_SF, new SignedWordElement(SUNSPEC_103 + 17)), // 40087
+						m(RefuStore100kChannelId.VA, new SignedWordElement(SUNSPEC_103 + 18), // 40088
 								ElementToChannelConverter.SCALE_FACTOR_1),
-						m(RefuStore88kChannelId.VA_SF, new SignedWordElement(SUNSPEC_103 + 19)), // 40089
+						m(RefuStore100kChannelId.VA_SF, new SignedWordElement(SUNSPEC_103 + 19)), // 40089
 						m(SymmetricBatteryInverter.ChannelId.REACTIVE_POWER, new SignedWordElement(SUNSPEC_103 + 20), // 40090
 																														// //
 								ElementToChannelConverter.SCALE_FACTOR_1), // REFUStore88KChannelId.VA_R
-						m(RefuStore88kChannelId.VA_R_SF, new SignedWordElement(SUNSPEC_103 + 21)), // 40091
+						m(RefuStore100kChannelId.VA_R_SF, new SignedWordElement(SUNSPEC_103 + 21)), // 40091
 						new DummyRegisterElement(SUNSPEC_103 + 22, SUNSPEC_103 + 23),
-						m(RefuStore88kChannelId.WH, new UnsignedDoublewordElement(SUNSPEC_103 + 24), // 40094
+						m(RefuStore100kChannelId.WH, new UnsignedDoublewordElement(SUNSPEC_103 + 24), // 40094
 								ElementToChannelConverter.SCALE_FACTOR_2),
-						m(RefuStore88kChannelId.WH_SF, new UnsignedWordElement(SUNSPEC_103 + 26)), // 40096
-						m(RefuStore88kChannelId.DCA, new SignedWordElement(SUNSPEC_103 + 27), // 40097
+						m(RefuStore100kChannelId.WH_SF, new UnsignedWordElement(SUNSPEC_103 + 26)), // 40096
+						m(RefuStore100kChannelId.DCA, new SignedWordElement(SUNSPEC_103 + 27), // 40097
 								ElementToChannelConverter.SCALE_FACTOR_MINUS_2),
-						m(RefuStore88kChannelId.DCA_SF, new UnsignedWordElement(SUNSPEC_103 + 28)), // 40098
-						m(RefuStore88kChannelId.DCV, new UnsignedWordElement(SUNSPEC_103 + 29), // 40099
+						m(RefuStore100kChannelId.DCA_SF, new UnsignedWordElement(SUNSPEC_103 + 28)), // 40098
+						m(RefuStore100kChannelId.DCV, new UnsignedWordElement(SUNSPEC_103 + 29), // 40099
 								ElementToChannelConverter.SCALE_FACTOR_MINUS_1),
-						m(RefuStore88kChannelId.DCV_SF, new UnsignedWordElement(SUNSPEC_103 + 30)), // 40100
-						m(RefuStore88kChannelId.DCW, new SignedWordElement(SUNSPEC_103 + 31), // 40101
+						m(RefuStore100kChannelId.DCV_SF, new UnsignedWordElement(SUNSPEC_103 + 30)), // 40100
+						m(RefuStore100kChannelId.DCW, new SignedWordElement(SUNSPEC_103 + 31), // 40101
 								ElementToChannelConverter.SCALE_FACTOR_1),
-						m(RefuStore88kChannelId.DCW_SF, new SignedWordElement(SUNSPEC_103 + 32)), // 40102
-						m(RefuStore88kChannelId.TMP_CAB, new SignedWordElement(SUNSPEC_103 + 33), // 40103
+						m(RefuStore100kChannelId.DCW_SF, new SignedWordElement(SUNSPEC_103 + 32)), // 40102
+						m(RefuStore100kChannelId.TMP_CAB, new SignedWordElement(SUNSPEC_103 + 33), // 40103
 								ElementToChannelConverter.SCALE_FACTOR_MINUS_1),
-						m(RefuStore88kChannelId.TMP_SNK, new SignedWordElement(SUNSPEC_103 + 34), // 40104
+						m(RefuStore100kChannelId.TMP_SNK, new SignedWordElement(SUNSPEC_103 + 34), // 40104
 								ElementToChannelConverter.SCALE_FACTOR_MINUS_1),
 						new DummyRegisterElement(SUNSPEC_103 + 35, SUNSPEC_103 + 36),
-						m(RefuStore88kChannelId.TMP_SF, new UnsignedWordElement(SUNSPEC_103 + 37)), // 40107
-						m(RefuStore88kChannelId.ST, new UnsignedWordElement(SUNSPEC_103 + 38)), // 40108
-						m(RefuStore88kChannelId.ST_VND, new UnsignedWordElement(SUNSPEC_103 + 39)), // 40109
+						m(RefuStore100kChannelId.TMP_SF, new UnsignedWordElement(SUNSPEC_103 + 37)), // 40107
+						m(RefuStore100kChannelId.ST, new UnsignedWordElement(SUNSPEC_103 + 38)), // 40108
+						m(RefuStore100kChannelId.ST_VND, new UnsignedWordElement(SUNSPEC_103 + 39)), // 40109
 						m(new BitsWordElement(SUNSPEC_103 + 40, this) //
-								.bit(0, RefuStore88kChannelId.OTHER_ALARM) //
-								.bit(1, RefuStore88kChannelId.OTHER_WARNING) //
+								.bit(0, RefuStore100kChannelId.OTHER_ALARM) //
+								.bit(1, RefuStore100kChannelId.OTHER_WARNING) //
 						), //
 						m(new BitsWordElement(SUNSPEC_103 + 41, this) //
-								.bit(0, RefuStore88kChannelId.GROUND_FAULT) //
-								.bit(1, RefuStore88kChannelId.DC_OVER_VOLTAGE) //
-								.bit(2, RefuStore88kChannelId.AC_DISCONNECT) //
-								.bit(3, RefuStore88kChannelId.DC_DISCONNECT) //
-								.bit(4, RefuStore88kChannelId.GRID_DISCONNECT) //
-								.bit(5, RefuStore88kChannelId.CABINET_OPEN) //
-								.bit(6, RefuStore88kChannelId.MANUAL_SHUTDOWN) //
-								.bit(7, RefuStore88kChannelId.OVER_TEMP) //
-								.bit(8, RefuStore88kChannelId.OVER_FREQUENCY) //
-								.bit(9, RefuStore88kChannelId.UNDER_FREQUENCY) //
-								.bit(10, RefuStore88kChannelId.AC_OVER_VOLT) //
-								.bit(11, RefuStore88kChannelId.AC_UNDER_VOLT) //
-								.bit(12, RefuStore88kChannelId.BLOWN_STRING_FUSE) //
-								.bit(13, RefuStore88kChannelId.UNDER_TEMP) //
-								.bit(14, RefuStore88kChannelId.MEMORY_LOSS) //
-								.bit(15, RefuStore88kChannelId.HW_TEST_FAILURE) //
+								.bit(0, RefuStore100kChannelId.GROUND_FAULT) //
+								.bit(1, RefuStore100kChannelId.DC_OVER_VOLTAGE) //
+								.bit(2, RefuStore100kChannelId.AC_DISCONNECT) //
+								.bit(3, RefuStore100kChannelId.DC_DISCONNECT) //
+								.bit(4, RefuStore100kChannelId.GRID_DISCONNECT) //
+								.bit(5, RefuStore100kChannelId.CABINET_OPEN) //
+								.bit(6, RefuStore100kChannelId.MANUAL_SHUTDOWN) //
+								.bit(7, RefuStore100kChannelId.OVER_TEMP) //
+								.bit(8, RefuStore100kChannelId.OVER_FREQUENCY) //
+								.bit(9, RefuStore100kChannelId.UNDER_FREQUENCY) //
+								.bit(10, RefuStore100kChannelId.AC_OVER_VOLT) //
+								.bit(11, RefuStore100kChannelId.AC_UNDER_VOLT) //
+								.bit(12, RefuStore100kChannelId.BLOWN_STRING_FUSE) //
+								.bit(13, RefuStore100kChannelId.UNDER_TEMP) //
+								.bit(14, RefuStore100kChannelId.MEMORY_LOSS) //
+								.bit(15, RefuStore100kChannelId.HW_TEST_FAILURE) //
 						), //
-						m(RefuStore88kChannelId.EVT_2, new UnsignedDoublewordElement(SUNSPEC_103 + 42)), // 40112
-						m(RefuStore88kChannelId.EVT_VND_1, new UnsignedDoublewordElement(SUNSPEC_103 + 44)), // 40114
-						m(RefuStore88kChannelId.EVT_VND_2, new UnsignedDoublewordElement(SUNSPEC_103 + 46)), // 40116
-						m(RefuStore88kChannelId.EVT_VND_3, new UnsignedDoublewordElement(SUNSPEC_103 + 48)), // 40118
-						m(RefuStore88kChannelId.EVT_VND_4, new UnsignedDoublewordElement(SUNSPEC_103 + 50))), // 40120
+						m(RefuStore100kChannelId.EVT_2, new UnsignedDoublewordElement(SUNSPEC_103 + 42)), // 40112
+						m(RefuStore100kChannelId.EVT_VND_1, new UnsignedDoublewordElement(SUNSPEC_103 + 44)), // 40114
+						m(RefuStore100kChannelId.EVT_VND_2, new UnsignedDoublewordElement(SUNSPEC_103 + 46)), // 40116
+						m(RefuStore100kChannelId.EVT_VND_3, new UnsignedDoublewordElement(SUNSPEC_103 + 48)), // 40118
+						m(RefuStore100kChannelId.EVT_VND_4, new UnsignedDoublewordElement(SUNSPEC_103 + 50))), // 40120
 
 				new FC3ReadRegistersTask(SUNSPEC_120, Priority.LOW, //
-						m(RefuStore88kChannelId.ID_120, new UnsignedWordElement(SUNSPEC_120)), // 40122
-						m(RefuStore88kChannelId.L_120, new UnsignedWordElement(SUNSPEC_120 + 1)), // 40123
-						m(RefuStore88kChannelId.DER_TYP, new UnsignedWordElement(SUNSPEC_120 + 2)), // 40124
-						m(RefuStore88kChannelId.W_RTG, new UnsignedWordElement(SUNSPEC_120 + 3), // 40125
+						m(RefuStore100kChannelId.ID_120, new UnsignedWordElement(SUNSPEC_120)), // 40122
+						m(RefuStore100kChannelId.L_120, new UnsignedWordElement(SUNSPEC_120 + 1)), // 40123
+						m(RefuStore100kChannelId.DER_TYP, new UnsignedWordElement(SUNSPEC_120 + 2)), // 40124
+						m(RefuStore100kChannelId.W_RTG, new UnsignedWordElement(SUNSPEC_120 + 3), // 40125
 								ElementToChannelConverter.SCALE_FACTOR_1),
-						m(RefuStore88kChannelId.W_RTG_SF, new UnsignedWordElement(SUNSPEC_120 + 4)), // 40126
+						m(RefuStore100kChannelId.W_RTG_SF, new UnsignedWordElement(SUNSPEC_120 + 4)), // 40126
 
 						m(new UnsignedWordElement(SUNSPEC_120 + 5))
 								.m(SymmetricBatteryInverter.ChannelId.MAX_APPARENT_POWER,
 										ElementToChannelConverter.SCALE_FACTOR_1)
-								.m(RefuStore88kChannelId.VA_RTG, ElementToChannelConverter.SCALE_FACTOR_1).build(),
-						m(RefuStore88kChannelId.VA_RTG_SF, new UnsignedWordElement(SUNSPEC_120 + 6)), // 40128
-						m(RefuStore88kChannelId.VAR_RTG_Q1, new SignedWordElement(SUNSPEC_120 + 7), // 40129
+								.m(RefuStore100kChannelId.VA_RTG, ElementToChannelConverter.SCALE_FACTOR_1).build(),
+						m(RefuStore100kChannelId.VA_RTG_SF, new UnsignedWordElement(SUNSPEC_120 + 6)), // 40128
+						m(RefuStore100kChannelId.VAR_RTG_Q1, new SignedWordElement(SUNSPEC_120 + 7), // 40129
 								ElementToChannelConverter.SCALE_FACTOR_1),
-						m(RefuStore88kChannelId.VAR_RTG_Q2, new SignedWordElement(SUNSPEC_120 + 8), // 40130
+						m(RefuStore100kChannelId.VAR_RTG_Q2, new SignedWordElement(SUNSPEC_120 + 8), // 40130
 								ElementToChannelConverter.SCALE_FACTOR_1),
-						m(RefuStore88kChannelId.VAR_RTG_Q3, new SignedWordElement(SUNSPEC_120 + 9), // 40131
+						m(RefuStore100kChannelId.VAR_RTG_Q3, new SignedWordElement(SUNSPEC_120 + 9), // 40131
 								ElementToChannelConverter.SCALE_FACTOR_1),
-						m(RefuStore88kChannelId.VAR_RTG_Q4, new SignedWordElement(SUNSPEC_120 + 10), // 40132
+						m(RefuStore100kChannelId.VAR_RTG_Q4, new SignedWordElement(SUNSPEC_120 + 10), // 40132
 								ElementToChannelConverter.SCALE_FACTOR_1),
-						m(RefuStore88kChannelId.VAR_RTG_SF, new SignedWordElement(SUNSPEC_120 + 11)), // 40133
-						m(RefuStore88kChannelId.A_RTG, new UnsignedWordElement(SUNSPEC_120 + 12), // 40134
+						m(RefuStore100kChannelId.VAR_RTG_SF, new SignedWordElement(SUNSPEC_120 + 11)), // 40133
+						m(RefuStore100kChannelId.A_RTG, new UnsignedWordElement(SUNSPEC_120 + 12), // 40134
 								ElementToChannelConverter.SCALE_FACTOR_MINUS_2),
-						m(RefuStore88kChannelId.A_RTG_SF, new SignedWordElement(SUNSPEC_120 + 13)), // 40135
-						m(RefuStore88kChannelId.PF_RTG_Q1, new SignedWordElement(SUNSPEC_120 + 14), // 40136
+						m(RefuStore100kChannelId.A_RTG_SF, new SignedWordElement(SUNSPEC_120 + 13)), // 40135
+						m(RefuStore100kChannelId.PF_RTG_Q1, new SignedWordElement(SUNSPEC_120 + 14), // 40136
 								ElementToChannelConverter.SCALE_FACTOR_MINUS_3),
-						m(RefuStore88kChannelId.PF_RTG_Q2, new SignedWordElement(SUNSPEC_120 + 15), // 40137
+						m(RefuStore100kChannelId.PF_RTG_Q2, new SignedWordElement(SUNSPEC_120 + 15), // 40137
 								ElementToChannelConverter.SCALE_FACTOR_MINUS_3),
-						m(RefuStore88kChannelId.PF_RTG_Q3, new SignedWordElement(SUNSPEC_120 + 16), // 40138
+						m(RefuStore100kChannelId.PF_RTG_Q3, new SignedWordElement(SUNSPEC_120 + 16), // 40138
 								ElementToChannelConverter.SCALE_FACTOR_MINUS_3),
-						m(RefuStore88kChannelId.PF_RTG_Q4, new SignedWordElement(SUNSPEC_120 + 17), // 40139
+						m(RefuStore100kChannelId.PF_RTG_Q4, new SignedWordElement(SUNSPEC_120 + 17), // 40139
 								ElementToChannelConverter.SCALE_FACTOR_MINUS_3),
-						m(RefuStore88kChannelId.PF_RTG_SF, new SignedWordElement(SUNSPEC_120 + 18)), // 40140
+						m(RefuStore100kChannelId.PF_RTG_SF, new SignedWordElement(SUNSPEC_120 + 18)), // 40140
 						new DummyRegisterElement(SUNSPEC_120 + 19, SUNSPEC_120 + 26),
-						m(RefuStore88kChannelId.PAD_120, new SignedWordElement(SUNSPEC_120 + 27))), // 40149
+						m(RefuStore100kChannelId.PAD_120, new SignedWordElement(SUNSPEC_120 + 27))), // 40149
 
 				new FC3ReadRegistersTask(SUNSPEC_121, Priority.LOW, //
-						m(RefuStore88kChannelId.ID_121, new UnsignedWordElement(SUNSPEC_121)), // 40150
-						m(RefuStore88kChannelId.L_121, new UnsignedWordElement(SUNSPEC_121 + 1)), // 40151
+						m(RefuStore100kChannelId.ID_121, new UnsignedWordElement(SUNSPEC_121)), // 40150
+						m(RefuStore100kChannelId.L_121, new UnsignedWordElement(SUNSPEC_121 + 1)), // 40151
 						new DummyRegisterElement(SUNSPEC_121 + 2, SUNSPEC_121 + 21),
-						m(RefuStore88kChannelId.W_MAX_SF, new UnsignedWordElement(SUNSPEC_121 + 22)), // 40172
-						m(RefuStore88kChannelId.V_REF_SF, new UnsignedWordElement(SUNSPEC_121 + 23)), // 40173
-						m(RefuStore88kChannelId.V_REF_OFS_SF, new UnsignedWordElement(SUNSPEC_121 + 24))), // 40174
+						m(RefuStore100kChannelId.W_MAX_SF, new UnsignedWordElement(SUNSPEC_121 + 22)), // 40172
+						m(RefuStore100kChannelId.V_REF_SF, new UnsignedWordElement(SUNSPEC_121 + 23)), // 40173
+						m(RefuStore100kChannelId.V_REF_OFS_SF, new UnsignedWordElement(SUNSPEC_121 + 24))), // 40174
 
 				new FC16WriteRegistersTask(SUNSPEC_121 + 2, //
-						m(RefuStore88kChannelId.W_MAX, new UnsignedWordElement(SUNSPEC_121 + 2), // 40152
+						m(RefuStore100kChannelId.W_MAX, new UnsignedWordElement(SUNSPEC_121 + 2), // 40152
 								ElementToChannelConverter.SCALE_FACTOR_1),
-						m(RefuStore88kChannelId.V_REF, new UnsignedWordElement(SUNSPEC_121 + 3), // 40153
+						m(RefuStore100kChannelId.V_REF, new UnsignedWordElement(SUNSPEC_121 + 3), // 40153
 								ElementToChannelConverter.SCALE_FACTOR_1),
-						m(RefuStore88kChannelId.V_REF_OFS, new UnsignedWordElement(SUNSPEC_121 + 4), // 40154
+						m(RefuStore100kChannelId.V_REF_OFS, new UnsignedWordElement(SUNSPEC_121 + 4), // 40154
 								ElementToChannelConverter.SCALE_FACTOR_1)),
 
 				new FC3ReadRegistersTask(SUNSPEC_123, Priority.LOW, //
-						m(RefuStore88kChannelId.ID_123, new UnsignedWordElement(SUNSPEC_123)), // 40182
-						m(RefuStore88kChannelId.L_123, new UnsignedWordElement(SUNSPEC_123 + 1)), // 40183
+						m(RefuStore100kChannelId.ID_123, new UnsignedWordElement(SUNSPEC_123)), // 40182
+						m(RefuStore100kChannelId.L_123, new UnsignedWordElement(SUNSPEC_123 + 1)), // 40183
 						new DummyRegisterElement(SUNSPEC_123 + 2, SUNSPEC_123 + 22),
-						m(RefuStore88kChannelId.W_MAX_LIM_PCT_SF, new UnsignedWordElement(SUNSPEC_123 + 23)), // 40205
-						m(RefuStore88kChannelId.OUT_PF_SET_SF, new UnsignedWordElement(SUNSPEC_123 + 24)), // 40206
-						m(RefuStore88kChannelId.VAR_PCT_SF, new UnsignedWordElement(SUNSPEC_123 + 25))), // 40207
+						m(RefuStore100kChannelId.W_MAX_LIM_PCT_SF, new UnsignedWordElement(SUNSPEC_123 + 23)), // 40205
+						m(RefuStore100kChannelId.OUT_PF_SET_SF, new UnsignedWordElement(SUNSPEC_123 + 24)), // 40206
+						m(RefuStore100kChannelId.VAR_PCT_SF, new UnsignedWordElement(SUNSPEC_123 + 25))), // 40207
 
 				new FC16WriteRegistersTask(SUNSPEC_123 + 4, //
-						m(RefuStore88kChannelId.CONN, new UnsignedWordElement(SUNSPEC_123 + 4)), // 40186
-						m(RefuStore88kChannelId.W_MAX_LIM_PCT, new SignedWordElement(SUNSPEC_123 + 5))), // 40187
+						m(RefuStore100kChannelId.CONN, new UnsignedWordElement(SUNSPEC_123 + 4)), // 40186
+						m(RefuStore100kChannelId.W_MAX_LIM_PCT, new SignedWordElement(SUNSPEC_123 + 5))), // 40187
 
 				new FC16WriteRegistersTask(SUNSPEC_123 + 9, //
-						m(RefuStore88kChannelId.W_MAX_LIM_ENA, new UnsignedWordElement(SUNSPEC_123 + 9)), // 40191
-						m(RefuStore88kChannelId.OUT_PF_SET, new SignedWordElement(SUNSPEC_123 + 10), // 40192
+						m(RefuStore100kChannelId.W_MAX_LIM_ENA, new UnsignedWordElement(SUNSPEC_123 + 9)), // 40191
+						m(RefuStore100kChannelId.OUT_PF_SET, new SignedWordElement(SUNSPEC_123 + 10), // 40192
 								ElementToChannelConverter.SCALE_FACTOR_MINUS_3)),
 
 				new FC16WriteRegistersTask(SUNSPEC_123 + 14, //
-						m(RefuStore88kChannelId.OUT_PF_SET_ENA, new UnsignedWordElement(SUNSPEC_123 + 14)), // 40196
-						m(RefuStore88kChannelId.VAR_W_MAX_PCT, new SignedWordElement(SUNSPEC_123 + 15), // 40197
+						m(RefuStore100kChannelId.OUT_PF_SET_ENA, new UnsignedWordElement(SUNSPEC_123 + 14)), // 40196
+						m(RefuStore100kChannelId.VAR_W_MAX_PCT, new SignedWordElement(SUNSPEC_123 + 15), // 40197
 								ElementToChannelConverter.SCALE_FACTOR_MINUS_1)),
 
 				new FC16WriteRegistersTask(SUNSPEC_123 + 22, //
-						m(RefuStore88kChannelId.VAR_PCT_ENA, new UnsignedWordElement(SUNSPEC_123 + 22))), // 40204
+						m(RefuStore100kChannelId.VAR_PCT_ENA, new UnsignedWordElement(SUNSPEC_123 + 22))), // 40204
 
 				new FC3ReadRegistersTask(SUNSPEC_64040, Priority.LOW, //
-						m(RefuStore88kChannelId.ID_64040, new UnsignedWordElement(SUNSPEC_64040)), // 40208
-						m(RefuStore88kChannelId.L_64040, new UnsignedWordElement(SUNSPEC_64040 + 1))), // 40209
+						m(RefuStore100kChannelId.ID_64040, new UnsignedWordElement(SUNSPEC_64040)), // 40208
+						m(RefuStore100kChannelId.L_64040, new UnsignedWordElement(SUNSPEC_64040 + 1))), // 40209
 
 				new FC16WriteRegistersTask(SUNSPEC_64040 + 2, //
-						m(RefuStore88kChannelId.READ_WRITE_PARAM_ID, new UnsignedDoublewordElement(SUNSPEC_64040 + 2)), // 40210
-						m(RefuStore88kChannelId.READ_WRITE_PARAM_INDEX,
+						m(RefuStore100kChannelId.READ_WRITE_PARAM_ID, new UnsignedDoublewordElement(SUNSPEC_64040 + 2)), // 40210
+						m(RefuStore100kChannelId.READ_WRITE_PARAM_INDEX,
 								new UnsignedDoublewordElement(SUNSPEC_64040 + 4))), // 40212
 
 				new FC3ReadRegistersTask(SUNSPEC_64041, Priority.LOW, //
-						m(RefuStore88kChannelId.ID_64041, new UnsignedWordElement(SUNSPEC_64041)), // 40213
-						m(RefuStore88kChannelId.L_64041, new UnsignedWordElement(SUNSPEC_64041 + 1))), // 40214
+						m(RefuStore100kChannelId.ID_64041, new UnsignedWordElement(SUNSPEC_64041)), // 40213
+						m(RefuStore100kChannelId.L_64041, new UnsignedWordElement(SUNSPEC_64041 + 1))), // 40214
 
 				new FC16WriteRegistersTask(SUNSPEC_64041 + 2, //
-						m(RefuStore88kChannelId.READ_WRITE_PARAM_VALUE_U32,
+						m(RefuStore100kChannelId.READ_WRITE_PARAM_VALUE_U32,
 								new UnsignedDoublewordElement(SUNSPEC_64041 + 2)), // 40215
-						m(RefuStore88kChannelId.READ_WRITE_PARAM_VALUE_S32,
+						m(RefuStore100kChannelId.READ_WRITE_PARAM_VALUE_S32,
 								new SignedDoublewordElement(SUNSPEC_64041 + 4)), // 40217
-						m(RefuStore88kChannelId.READ_WRITE_PARAM_VALUE_F32,
+						m(RefuStore100kChannelId.READ_WRITE_PARAM_VALUE_F32,
 								new SignedDoublewordElement(SUNSPEC_64041 + 6)), // 40219
-						m(RefuStore88kChannelId.READ_WRITE_PARAM_VALUE_U16, new UnsignedWordElement(SUNSPEC_64041 + 8)), // 40221
-						m(RefuStore88kChannelId.READ_WRITE_PARAM_VALUE_S16, new SignedWordElement(SUNSPEC_64041 + 9)), // 40222
-						m(RefuStore88kChannelId.READ_WRITE_PARAM_VALUE_U8, new UnsignedWordElement(SUNSPEC_64041 + 10)), // 40223
-						m(RefuStore88kChannelId.READ_WRITE_PARAM_VALUE_S8, new SignedWordElement(SUNSPEC_64041 + 11))), // 40224
+						m(RefuStore100kChannelId.READ_WRITE_PARAM_VALUE_U16, new UnsignedWordElement(SUNSPEC_64041 + 8)), // 40221
+						m(RefuStore100kChannelId.READ_WRITE_PARAM_VALUE_S16, new SignedWordElement(SUNSPEC_64041 + 9)), // 40222
+						m(RefuStore100kChannelId.READ_WRITE_PARAM_VALUE_U8, new UnsignedWordElement(SUNSPEC_64041 + 10)), // 40223
+						m(RefuStore100kChannelId.READ_WRITE_PARAM_VALUE_S8, new SignedWordElement(SUNSPEC_64041 + 11))), // 40224
 
 				new FC16WriteRegistersTask(SUNSPEC_64800, //
-						m(RefuStore88kChannelId.ID_64800, new UnsignedWordElement(SUNSPEC_64800)), // 40225
-						m(RefuStore88kChannelId.L_64800, new UnsignedWordElement(SUNSPEC_64800 + 1)), // 40226
-						m(RefuStore88kChannelId.LOC_REM_CTL, new SignedWordElement(SUNSPEC_64800 + 2))), // 40227
+						m(RefuStore100kChannelId.ID_64800, new UnsignedWordElement(SUNSPEC_64800)), // 40225
+						m(RefuStore100kChannelId.L_64800, new UnsignedWordElement(SUNSPEC_64800 + 1)), // 40226
+						m(RefuStore100kChannelId.LOC_REM_CTL, new SignedWordElement(SUNSPEC_64800 + 2))), // 40227
 
 				new FC3ReadRegistersTask(SUNSPEC_64800 + 3, Priority.LOW, //
-						m(RefuStore88kChannelId.PCS_HB, new SignedWordElement(SUNSPEC_64800 + 3)), // 40228
-						m(RefuStore88kChannelId.CONTROLLER_HB, new SignedWordElement(SUNSPEC_64800 + 4)), // 40229
+						m(RefuStore100kChannelId.PCS_HB, new SignedWordElement(SUNSPEC_64800 + 3)), // 40228
+						m(RefuStore100kChannelId.CONTROLLER_HB, new SignedWordElement(SUNSPEC_64800 + 4)), // 40229
 						new DummyRegisterElement(SUNSPEC_64800 + 5)),
 
 				new FC16WriteRegistersTask(SUNSPEC_64800 + 6, //
-						m(RefuStore88kChannelId.PCS_SET_OPERATION, new SignedWordElement(SUNSPEC_64800 + 6)), // 40231
-						m(RefuStore88kChannelId.MAX_BAT_A_CHA, new UnsignedWordElement(SUNSPEC_64800 + 7), // 40232
+						m(RefuStore100kChannelId.PCS_SET_OPERATION, new SignedWordElement(SUNSPEC_64800 + 6)), // 40231
+						m(RefuStore100kChannelId.MAX_BAT_A_CHA, new UnsignedWordElement(SUNSPEC_64800 + 7), // 40232
 								ElementToChannelConverter.SCALE_FACTOR_MINUS_2),
-						m(RefuStore88kChannelId.MAX_BAT_A_DISCHA, new UnsignedWordElement(SUNSPEC_64800 + 8), // 40233
+						m(RefuStore100kChannelId.MAX_BAT_A_DISCHA, new UnsignedWordElement(SUNSPEC_64800 + 8), // 40233
 								ElementToChannelConverter.SCALE_FACTOR_MINUS_2),
-						m(RefuStore88kChannelId.MAX_A, new UnsignedWordElement(SUNSPEC_64800 + 9)), // 40234
-						m(RefuStore88kChannelId.MAX_A_CUR, new UnsignedWordElement(SUNSPEC_64800 + 10)), // 40235
-						m(RefuStore88kChannelId.MAX_BAT_A_SF, new SignedWordElement(SUNSPEC_64800 + 11)), // 40236
-						m(RefuStore88kChannelId.MAX_A_SF, new SignedWordElement(SUNSPEC_64800 + 12)), // 40237
-						m(RefuStore88kChannelId.MAX_A_CUR_SF, new SignedWordElement(SUNSPEC_64800 + 13)), // 40238
-						m(RefuStore88kChannelId.PADDING_1, new SignedWordElement(SUNSPEC_64800 + 14)), // 40239
-						m(RefuStore88kChannelId.PADDING_2, new SignedWordElement(SUNSPEC_64800 + 15)))); // 40240
+						m(RefuStore100kChannelId.MAX_A, new UnsignedWordElement(SUNSPEC_64800 + 9)), // 40234
+						m(RefuStore100kChannelId.MAX_A_CUR, new UnsignedWordElement(SUNSPEC_64800 + 10)), // 40235
+						m(RefuStore100kChannelId.MAX_BAT_A_SF, new SignedWordElement(SUNSPEC_64800 + 11)), // 40236
+						m(RefuStore100kChannelId.MAX_A_SF, new SignedWordElement(SUNSPEC_64800 + 12)), // 40237
+						m(RefuStore100kChannelId.MAX_A_CUR_SF, new SignedWordElement(SUNSPEC_64800 + 13)), // 40238
+						m(RefuStore100kChannelId.PADDING_1, new SignedWordElement(SUNSPEC_64800 + 14)), // 40239
+						m(RefuStore100kChannelId.PADDING_2, new SignedWordElement(SUNSPEC_64800 + 15)))); // 40240
 
 	}
 
@@ -452,8 +452,8 @@ public class RefuStore88kImpl extends AbstractOpenemsModbusComponent implements 
 	public String debugLog() {
 		return "P:" + this.getActivePower().asString() //
 				+ "|Q:" + this.getReactivePower().asString() //
-				+ "|DC:" + this.channel(RefuStore88kChannelId.DCV).value().asString() //
-				+ "|" + this.channel(RefuStore88kChannelId.ST).value().asOptionString() //
+				+ "|DC:" + this.channel(RefuStore100kChannelId.DCV).value().asString() //
+				+ "|" + this.channel(RefuStore100kChannelId.ST).value().asOptionString() //
 				+ "|" + this.stateMachine.getCurrentState().asCamelCase();
 	}
 

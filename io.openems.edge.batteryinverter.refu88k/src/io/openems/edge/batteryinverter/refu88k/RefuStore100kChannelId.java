@@ -17,7 +17,7 @@ import io.openems.edge.batteryinverter.refu88k.statemachine.StateMachine.State;
 import io.openems.edge.common.channel.ChannelId;
 import io.openems.edge.common.channel.Doc;
 
-public enum RefuStore88kChannelId implements ChannelId {
+public enum RefuStore100kChannelId implements ChannelId {
 
 	STATE_MACHINE(Doc.of(State.values()) //
 			.text("Current State of State-Machine")), //
@@ -220,7 +220,7 @@ public enum RefuStore88kChannelId implements ChannelId {
 
 	private final Doc doc;
 
-	private RefuStore88kChannelId(Doc doc) {
+	private RefuStore100kChannelId(Doc doc) {
 		this.doc = doc;
 	}
 

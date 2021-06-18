@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import io.openems.common.exceptions.OpenemsError.OpenemsNamedException;
 import io.openems.edge.batteryinverter.api.SymmetricBatteryInverter;
 import io.openems.edge.batteryinverter.refu88k.RefuStore88k;
-import io.openems.edge.batteryinverter.refu88k.RefuStore88kChannelId;
+import io.openems.edge.batteryinverter.refu88k.RefuStore100kChannelId;
 import io.openems.edge.batteryinverter.refu88k.enums.VArPctEna;
 import io.openems.edge.batteryinverter.refu88k.enums.WMaxLimEna;
 import io.openems.edge.batteryinverter.refu88k.statemachine.StateMachine.State;
@@ -74,11 +74,11 @@ public class RunningHandler extends StateHandler<State, Context> {
 		// Calculate Reactive Power as a percentage of WMAX
 		varSetPct = ((100 * context.setReactivePower) / maxApparentPower);
 
-		IntegerWriteChannel wMaxLimPctChannel = inverter.channel(RefuStore88kChannelId.W_MAX_LIM_PCT);
-		EnumWriteChannel wMaxLim_EnaChannel = inverter.channel(RefuStore88kChannelId.W_MAX_LIM_ENA);
+		IntegerWriteChannel wMaxLimPctChannel = inverter.channel(RefuStore100kChannelId.W_MAX_LIM_PCT);
+		EnumWriteChannel wMaxLim_EnaChannel = inverter.channel(RefuStore100kChannelId.W_MAX_LIM_ENA);
 
-		IntegerWriteChannel varMaxLimPctChannel = inverter.channel(RefuStore88kChannelId.VAR_W_MAX_PCT);
-		EnumWriteChannel varMaxLim_EnaChannel = inverter.channel(RefuStore88kChannelId.VAR_PCT_ENA);
+		IntegerWriteChannel varMaxLimPctChannel = inverter.channel(RefuStore100kChannelId.VAR_W_MAX_PCT);
+		EnumWriteChannel varMaxLim_EnaChannel = inverter.channel(RefuStore100kChannelId.VAR_PCT_ENA);
 
 		wMaxLimPctChannel.setNextWriteValue(wSetPct);
 		wMaxLim_EnaChannel.setNextWriteValue(WMaxLimEna.ENABLED);
