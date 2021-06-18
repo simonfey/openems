@@ -1,5 +1,6 @@
 package io.openems.edge.batteryinverter.refu100k;
 
+import io.openems.edge.common.startstop.StartStopConfig;
 import io.openems.edge.common.test.AbstractComponentConfig;
 
 @SuppressWarnings("all")
@@ -41,6 +42,12 @@ public class MyConfig extends AbstractComponentConfig implements Config {
 	private MyConfig(Builder builder) {
 		super(Config.class, builder.id);
 		this.builder = builder;
+	}
+
+	@Override
+	public StartStopConfig startStop() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 //	@Override
