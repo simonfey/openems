@@ -30,7 +30,7 @@ import io.openems.edge.batteryinverter.refu100k.enums.SystemState;
 import io.openems.edge.batteryinverter.refu100k.statemachine.Context;
 import io.openems.edge.batteryinverter.refu100k.statemachine.StateMachine;
 import io.openems.edge.batteryinverter.refu100k.statemachine.StateMachine.State;
-import io.openems.edge.batteryinverter.refu88k.RefuStore100kChannelId;
+import io.openems.edge.batteryinverter.refu88k.RefuStore88kChannelId;
 import io.openems.edge.batteryinverter.refu88k.enums.OperatingState;
 import io.openems.edge.bridge.modbus.api.AbstractOpenemsModbusComponent;
 import io.openems.edge.bridge.modbus.api.ElementToChannelConverter;
@@ -104,7 +104,7 @@ public class RefuStore100kImpl extends AbstractOpenemsModbusComponent implements
 				OpenemsComponent.ChannelId.values(), //
 				SymmetricEss.ChannelId.values(), //
 				ManagedSymmetricEss.ChannelId.values(), //
-				StartStoppable.ChannelId.values(), RefuStore100kChannelId.values() // ,
+				StartStoppable.ChannelId.values(), RefuStore88kChannelId.values() // ,
 		);
 		this._setMaxApparentPower(MAX_APPARENT_POWER);
 	}
@@ -643,9 +643,9 @@ public class RefuStore100kImpl extends AbstractOpenemsModbusComponent implements
 		return this.channel(RefuStore100kChannelId.SET_REACTIVE_POWER_L3);
 	}
 	
-//	public  OperatingState getOperatingState() {
-//		return this.channel(RefuStore100kChannelId.ST).value().asEnum();
-//	}
+	public  OperatingState getOperatingState() {
+		return this.channel(RefuStore100kChannelId.SYSTEM_STATE).value().asEnum();
+	}
 
 	@Override
 	public Timedata getTimedata() {

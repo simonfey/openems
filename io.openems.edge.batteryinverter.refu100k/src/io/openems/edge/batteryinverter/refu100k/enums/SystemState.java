@@ -11,7 +11,7 @@ public enum SystemState implements OptionsEnum {
 	INIT(1, "Init"), //
 	PRE_OPERATION(2, "Pre-operation"), //
 	STANDBY(3, "Stand by"), //
-	START(4, "Start"), //
+	START(4, "Start"), // operational mode is set as start
 	FAULT(5, "Fault") //
 	; //
 	private final int value;
