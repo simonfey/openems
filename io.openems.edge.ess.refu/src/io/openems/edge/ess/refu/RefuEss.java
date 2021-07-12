@@ -12,8 +12,8 @@ import io.openems.edge.common.modbusslave.ModbusSlave;
 import io.openems.edge.ess.api.ManagedSymmetricEss;
 import io.openems.edge.ess.api.SymmetricEss;
 
-public interface RefuEss  extends SymmetricEss, ManagedSymmetricEss, EventHandler, OpenemsComponent, ModbusSlave{
-
+public interface RefuEss extends SymmetricEss, ManagedSymmetricEss, EventHandler, OpenemsComponent, ModbusSlave {
+	
 	public enum ChannelId implements io.openems.edge.common.channel.ChannelId {
 		// IntegerWriteChannel
 		SET_ACTIVE_POWER(Doc.of(OpenemsType.INTEGER) //

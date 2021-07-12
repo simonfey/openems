@@ -4,7 +4,7 @@ import org.osgi.service.metatype.annotations.AttributeDefinition;
 import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 
 
-@ObjectClassDefinition( //
+@ObjectClassDefinition(//
 		name = "ESS Refu", //
 		description = "The energy storage system implementation of a Refu Ess.")
 @interface Config {

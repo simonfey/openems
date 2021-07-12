@@ -67,8 +67,8 @@ public class RefuEssImpl extends AbstractOpenemsModbusComponent implements RefuE
 
 	private final Logger log = LoggerFactory.getLogger(RefuEssImpl.class);
 
-	protected final static int MAX_APPARENT_POWER = 100_000;
-	private final static int UNIT_ID = 1;
+	protected static final int MAX_APPARENT_POWER = 100_000;
+	private static final int UNIT_ID = 1;
 
 	@Reference
 	private Power power;
@@ -432,7 +432,7 @@ public class RefuEssImpl extends AbstractOpenemsModbusComponent implements RefuE
 
 	@Override
 	public ModbusSlaveTable getModbusSlaveTable(AccessMode accessMode) {
-		return new ModbusSlaveTable( //
+		return new ModbusSlaveTable(//
 				OpenemsComponent.getModbusSlaveNatureTable(accessMode), //
 				SymmetricEss.getModbusSlaveNatureTable(accessMode), //
 				ManagedSymmetricEss.getModbusSlaveNatureTable(accessMode), //
@@ -463,7 +463,7 @@ public class RefuEssImpl extends AbstractOpenemsModbusComponent implements RefuE
 		 * Specific handling for REFU to never be at -5000 < power < 5000 if battery is
 		 * full/empty
 		 */
-		if ( // Battery is full and discharge power < 5000
+		if (// Battery is full and discharge power < 5000
 		(allowedCharge > -100 && activePower > 0 && activePower < 5000)
 				// Battery is empty and charge power > -5000
 				|| (allowedDischarge < 100 && activePower < 0 && activePower > -5000)) {
@@ -481,108 +481,8 @@ public class RefuEssImpl extends AbstractOpenemsModbusComponent implements RefuE
 		this.getSetReactivePowerL2Channel().setNextWriteValue(reactivePowerL2);
 		this.getSetReactivePowerL3Channel().setNextWriteValue(reactivePowerL3);
 	}
-
-	// *************************
-	// Helper methods
-	// *************************
-
-	/**
-	 * This Method set the operational mode from the config
-	 * 
-	 * @param {@link SetOperationMode}
-	 */
-	private void operationalMode(SetOperationMode setOperationMode) {
-		EnumWriteChannel currentState = this.channel(RefuEss.ChannelId.SET_OPERATION_MODE);
-		try {
-			currentState.setNextWriteValue(setOperationMode);
-		} catch (OpenemsNamedException e) {
-			log.error("Enum write channel (SET_OPERATION_MODE) was not able to set");
-		}
-	}
-
-	/**
-	 * Handle state machine based on the input from the config
-	 */
-	private void handleEssState() {
-		switch (this.config.essState()) {
-		case DEFAULT:
-			this.handleStateMachine();
-			break;
-		case OFF:
-			this.setWorkingstate(StopStart.STOP);
-			break;
-		case ON:
-			this.setWorkingstate(StopStart.START);
-			break;
-		}
-	}
-
-	/**
-	 * This method sets the workstate to start or stop
-	 * 
-	 * @param {{@link {@link StopStart}}}
-	 */
-	private void setWorkingstate(StopStart start) {
-
-		EnumWriteChannel currentState = this.channel(RefuEss.ChannelId.SET_WORK_STATE);
-		try {
-			currentState.setNextWriteValue(start);
-		} catch (OpenemsNamedException e) {
-			log.error("Enum write channel (SET_WORK_STATE) was not able to set");
-		}
-	}
-
-	/**
-	 * Method to handle the state machine of the ess inverter
-	 */
-	private void handleStateMachine() {
-
-		switch (this.getSystemState()) {
-		case ERROR:
-			log.info("Error state");
-			this.setWorkingstate(StopStart.STOP);
-			break;
-		case OFF:
-			log.info("Off state");
-			this.setWorkingstate(StopStart.STOP);
-			break;
-
-		case INIT:
-			log.info("Init State");
-			this.setWorkingstate(StopStart.START);
-			break;
-		case OPERATION:
-			log.info("Operational state");
-			this.setWorkingstate(StopStart.START);
-			break;
-		case PRE_OPERATION:
-			log.info("Pre_Operational state");
-			this.setWorkingstate(StopStart.START);
-			break;
-		case STANDBY:
-			log.info("Stand-by state");
-			this.setWorkingstate(StopStart.START);
-			break;
-		case UNDEFINED:
-			log.info("Undefined state");
-			break;
-
-		}
-	}
-
-	/**
-	 * This method gets the state of the system {@link SystemState}
-	 * 
-	 * @return
-	 */
-	private SystemState getSystemState() {
-		this.channel(RefuEss.ChannelId.SYSTEM_STATE);
-
-		EnumReadChannel currentState = this.channel(RefuEss.ChannelId.SYSTEM_STATE);
-		SystemState curState = currentState.value().asEnum();
-		return curState;
-	}
-
+	
+	@Override
 	public Constraint[] getStaticConstraints() throws OpenemsException {
 		SystemState systemState = this.channel(RefuEss.ChannelId.SYSTEM_STATE).value().asEnum();
 		switch (systemState) {
@@ -610,6 +510,107 @@ public class RefuEssImpl extends AbstractOpenemsModbusComponent implements RefuE
 			break;
 		}
 		return Power.NO_CONSTRAINTS;
+	}
+
+	// *************************
+	// Helper methods
+	// *************************
+
+	/**
+	 * This Method set the operational mode from the config.
+	 * 
+	 * @param setOperationMode {@link setOperationMode} the operational state of the system.
+	 */
+	private void operationalMode(SetOperationMode setOperationMode) {
+		EnumWriteChannel currentState = this.channel(RefuEss.ChannelId.SET_OPERATION_MODE);
+		try {
+			currentState.setNextWriteValue(setOperationMode);
+		} catch (OpenemsNamedException e) {
+			this.log.error("Enum write channel (SET_OPERATION_MODE) was not able to set");
+		}
+	}
+
+	/**
+	 * Handle state machine based on the input from the config.
+	 */
+	private void handleEssState() {
+		switch (this.config.essState()) {
+		case DEFAULT:
+			this.handleStateMachine();
+			break;
+		case OFF:
+			this.setWorkingstate(StopStart.STOP);
+			break;
+		case ON:
+			this.setWorkingstate(StopStart.START);
+			break;
+		}
+	}
+
+	/**
+	 * This method sets the workstate to start or stop.
+	 * 
+	 * @param start {@link StopStart} stopstart enum
+	 */
+	private void setWorkingstate(StopStart start) {
+
+		EnumWriteChannel currentState = this.channel(RefuEss.ChannelId.SET_WORK_STATE);
+		try {
+			currentState.setNextWriteValue(start);
+		} catch (OpenemsNamedException e) {
+			this.log.error("Enum write channel (SET_WORK_STATE) was not able to set");
+		}
+	}
+
+	/**
+	 * Method to handle the state machine of the ess inverter.
+	 */
+	private void handleStateMachine() {
+
+		switch (this.getSystemState()) {
+		case ERROR:
+			this.log.info("Error state");
+			this.setWorkingstate(StopStart.STOP);
+			break;
+		case OFF:
+			this.log.info("Off state");
+			this.setWorkingstate(StopStart.STOP);
+			break;
+
+		case INIT:
+			this.log.info("Init State");
+			this.setWorkingstate(StopStart.START);
+			break;
+		case OPERATION:
+			this.log.info("Operational state");
+			this.setWorkingstate(StopStart.START);
+			break;
+		case PRE_OPERATION:
+			this.log.info("Pre_Operational state");
+			this.setWorkingstate(StopStart.START);
+			break;
+		case STANDBY:
+			this.log.info("Stand-by state");
+			this.setWorkingstate(StopStart.START);
+			break;
+		case UNDEFINED:
+			this.log.info("Undefined state");
+			break;
+
+		}
+	}
+
+	/**
+	 * This method gets the state of the system.
+	 * 
+	 * @return SystemState {@link SystemState} state of the system
+	 */
+	private SystemState getSystemState() {
+		this.channel(RefuEss.ChannelId.SYSTEM_STATE);
+
+		EnumReadChannel currentState = this.channel(RefuEss.ChannelId.SYSTEM_STATE);
+		SystemState curState = currentState.value().asEnum();
+		return curState;
 	}
 
 	private IntegerWriteChannel getSetActivePowerL1Channel() {
