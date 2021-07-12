@@ -1,3 +1,0 @@
-= io.openems.edge.batteryinverter.refu100k
-
-https://github.com/OpenEMS/openems/tree/develop/io.openems.edge.batteryinverter.refu100k[Source Code icon:github[]]
