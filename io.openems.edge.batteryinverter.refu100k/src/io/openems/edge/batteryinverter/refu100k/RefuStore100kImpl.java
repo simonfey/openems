@@ -16,7 +16,6 @@ import org.osgi.service.event.Event;
 import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 import org.osgi.service.metatype.annotations.Designate;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +30,6 @@ import io.openems.edge.batteryinverter.refu100k.statemachine.Context;
 import io.openems.edge.batteryinverter.refu100k.statemachine.StateMachine;
 import io.openems.edge.batteryinverter.refu100k.statemachine.StateMachine.State;
 import io.openems.edge.batteryinverter.refu88k.RefuStore88kChannelId;
-import io.openems.edge.batteryinverter.refu88k.enums.OperatingState;
 import io.openems.edge.bridge.modbus.api.AbstractOpenemsModbusComponent;
 import io.openems.edge.bridge.modbus.api.ElementToChannelConverter;
 import io.openems.edge.bridge.modbus.api.ModbusProtocol;
@@ -44,9 +42,7 @@ import io.openems.edge.bridge.modbus.api.element.WordOrder;
 import io.openems.edge.bridge.modbus.api.task.FC16WriteRegistersTask;
 import io.openems.edge.bridge.modbus.api.task.FC3ReadRegistersTask;
 import io.openems.edge.bridge.modbus.api.task.FC4ReadInputRegistersTask;
-import io.openems.edge.common.channel.Doc;
 import io.openems.edge.common.channel.IntegerWriteChannel;
-import io.openems.edge.common.component.AbstractOpenemsComponent;
 import io.openems.edge.common.component.OpenemsComponent;
 import io.openems.edge.common.event.EdgeEventConstants;
 import io.openems.edge.common.startstop.StartStop;
@@ -55,9 +51,7 @@ import io.openems.edge.common.taskmanager.Priority;
 import io.openems.edge.ess.api.AsymmetricEss;
 import io.openems.edge.ess.api.ManagedSymmetricEss;
 import io.openems.edge.ess.api.SymmetricEss;
-import io.openems.edge.ess.power.api.Constraint;
 import io.openems.edge.ess.power.api.Phase;
-import io.openems.edge.ess.power.api.Power;
 import io.openems.edge.ess.power.api.Pwr;
 import io.openems.edge.ess.power.api.Relationship;
 import io.openems.edge.timedata.api.Timedata;
@@ -73,8 +67,8 @@ import io.openems.edge.timedata.api.utils.CalculateEnergyFromPower;
 				EventConstants.EVENT_TOPIC + "=" + EdgeEventConstants.TOPIC_CYCLE_BEFORE_PROCESS_IMAGE //
 		} //
 )
-public class RefuStore100kImpl extends AbstractOpenemsModbusComponent implements RefuStore100k,
-		ManagedSymmetricBatteryInverter, SymmetricBatteryInverter, OpenemsComponent, EventHandler, TimedataProvider, StartStoppable {
+public class RefuStore100kImpl extends AbstractOpenemsModbusComponent
+		implements RefuStore100k, ManagedSymmetricBatteryInverter, EventHandler, TimedataProvider, StartStoppable {
 
 	private final Logger log = LoggerFactory.getLogger(RefuStore100kImpl.class);
 	private Config config = null;
@@ -134,7 +128,7 @@ public class RefuStore100kImpl extends AbstractOpenemsModbusComponent implements
 
 	@Override
 	public void run(Battery battery, int setActivePower, int setReactivePower) throws OpenemsNamedException {
-		
+
 		// Store the current State
 		this.channel(RefuStore100k.ChannelId.STATE_MACHINE).setNextValue(this.stateMachine.getCurrentState());
 
@@ -143,10 +137,10 @@ public class RefuStore100kImpl extends AbstractOpenemsModbusComponent implements
 
 		// Set Battery Limits
 		this.setBatteryLimits(battery);
-		
+
 		// Calculate the Energy values from ActivePower.
 		this.calculateEnergy();
-		
+
 		// Prepare Context
 		Context context = new Context(this, battery, this.config, setActivePower, setReactivePower);
 
@@ -161,39 +155,8 @@ public class RefuStore100kImpl extends AbstractOpenemsModbusComponent implements
 			this.logError(this.log, "StateMachine failed: " + e.getMessage());
 		}
 
-		
 	}
-	
-//	@Override
-//	public void applyPower(int activePowerL1, int reactivePowerL1, int activePowerL2, int reactivePowerL2,
-//			int activePowerL3, int reactivePowerL3) throws OpenemsNamedException {
-//		int activePower = activePowerL1 + activePowerL2 + activePowerL3;
-//		int allowedCharge = this.getAllowedChargePower().orElse(0);
-//		int allowedDischarge = this.getAllowedDischargePower().orElse(0);
-//
-//		/*
-//		 * Specific handling for REFU to never be at -5000 < power < 5000 if battery is
-//		 * full/empty
-//		 */
-//		if ( // Battery is full and discharge power < 5000
-//		(allowedCharge > -100 && activePower > 0 && activePower < 5000)
-//				// Battery is empty and charge power > -5000
-//				|| (allowedDischarge < 100 && activePower < 0 && activePower > -5000)) {
-//			activePowerL1 = 0;
-//			activePowerL2 = 0;
-//			activePowerL3 = 0;
-//			reactivePowerL1 = 0;
-//			reactivePowerL2 = 0;
-//			reactivePowerL3 = 0;
-//		}
-//		this.getSetActivePowerL1Channel().setNextWriteValue(activePowerL1);
-//		this.getSetActivePowerL2Channel().setNextWriteValue(activePowerL2);
-//		this.getSetActivePowerL3Channel().setNextWriteValue(activePowerL3);
-//		this.getSetReactivePowerL1Channel().setNextWriteValue(reactivePowerL1);
-//		this.getSetReactivePowerL2Channel().setNextWriteValue(reactivePowerL2);
-//		this.getSetReactivePowerL3Channel().setNextWriteValue(reactivePowerL3);
-//	}
-	
+
 	private void setBatteryLimits(Battery battery) throws OpenemsNamedException {
 
 		int maxBatteryChargeValue = battery.getChargeMaxCurrent().orElse(0);
@@ -205,8 +168,6 @@ public class RefuStore100kImpl extends AbstractOpenemsModbusComponent implements
 		IntegerWriteChannel maxBatADischaChannel = this.channel(RefuStore100kChannelId.ALLOWED_DISCHARGE_CURRENT);
 		maxBatADischaChannel.setNextWriteValue(maxBatteryDischargeValue);
 	}
-
-	
 
 	/**
 	 * Calculate the Energy values from ActivePower.
@@ -228,8 +189,7 @@ public class RefuStore100kImpl extends AbstractOpenemsModbusComponent implements
 			this.calculateDischargeEnergy.update(0);
 		}
 	}
-	
-	
+
 	@Override
 	public int getPowerPrecision() {
 		return MAX_APPARENT_POWER / 1000;
@@ -388,7 +348,7 @@ public class RefuStore100kImpl extends AbstractOpenemsModbusComponent implements
 								ElementToChannelConverter.SCALE_FACTOR_2), //
 						m(RefuStore100kChannelId.CURRENT_L3, new SignedWordElement(0x10C),
 								ElementToChannelConverter.SCALE_FACTOR_2),
-						m(SymmetricEss.ChannelId.ACTIVE_POWER, new SignedWordElement(0x10D),
+						m(SymmetricBatteryInverter.ChannelId.ACTIVE_POWER, new SignedWordElement(0x10D),
 								ElementToChannelConverter.SCALE_FACTOR_2), //
 						m(AsymmetricEss.ChannelId.ACTIVE_POWER_L1, new SignedWordElement(0x10E),
 								ElementToChannelConverter.SCALE_FACTOR_2), //
@@ -619,38 +579,45 @@ public class RefuStore100kImpl extends AbstractOpenemsModbusComponent implements
 
 	}
 
-	private IntegerWriteChannel getSetActivePowerL1Channel() {
+	@Override
+	public IntegerWriteChannel getSetActivePowerL1Channel() {
 		return this.channel(RefuStore100kChannelId.SET_ACTIVE_POWER_L1);
 	}
 
-	private IntegerWriteChannel getSetActivePowerL2Channel() {
+	@Override
+	public IntegerWriteChannel getSetActivePowerL2Channel() {
 		return this.channel(RefuStore100kChannelId.SET_ACTIVE_POWER_L2);
 	}
 
-	private IntegerWriteChannel getSetActivePowerL3Channel() {
+	@Override
+	public IntegerWriteChannel getSetActivePowerL3Channel() {
 		return this.channel(RefuStore100kChannelId.SET_ACTIVE_POWER_L3);
 	}
 
-	private IntegerWriteChannel getSetReactivePowerL1Channel() {
+	@Override
+	public IntegerWriteChannel getSetReactivePowerL1Channel() {
 		return this.channel(RefuStore100kChannelId.SET_REACTIVE_POWER_L1);
 	}
 
-	private IntegerWriteChannel getSetReactivePowerL2Channel() {
+	@Override
+	public IntegerWriteChannel getSetReactivePowerL2Channel() {
 		return this.channel(RefuStore100kChannelId.SET_REACTIVE_POWER_L2);
 	}
 
-	private IntegerWriteChannel getSetReactivePowerL3Channel() {
+	@Override
+	public IntegerWriteChannel getSetReactivePowerL3Channel() {
 		return this.channel(RefuStore100kChannelId.SET_REACTIVE_POWER_L3);
-	}
-	
-	public  OperatingState getOperatingState() {
-		return this.channel(RefuStore100kChannelId.SYSTEM_STATE).value().asEnum();
 	}
 
 	@Override
 	public Timedata getTimedata() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public SystemState getSystemState() {
+		return this.channel(RefuStore100kChannelId.SYSTEM_STATE).value().asEnum();
 	}
 
 }
