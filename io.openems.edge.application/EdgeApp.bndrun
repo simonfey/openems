@@ -95,6 +95,7 @@
 	bnd.identity;id='io.openems.edge.ess.generic',\
 	bnd.identity;id='io.openems.edge.ess.kaco.blueplanet.gridsave50',\
 	bnd.identity;id='io.openems.edge.ess.mr.gridcon',\
+	bnd.identity;id='io.openems.edge.ess.refu',\
 	bnd.identity;id='io.openems.edge.ess.sinexcel',\
 	bnd.identity;id='io.openems.edge.ess.sma',\
 	bnd.identity;id='io.openems.edge.evcs.cluster',\
@@ -225,6 +226,7 @@
 	io.openems.edge.ess.generic;version=snapshot,\
 	io.openems.edge.ess.kaco.blueplanet.gridsave50;version=snapshot,\
 	io.openems.edge.ess.mr.gridcon;version=snapshot,\
+	io.openems.edge.ess.refu;version=snapshot,\
 	io.openems.edge.ess.sinexcel;version=snapshot,\
 	io.openems.edge.ess.sma;version=snapshot,\
 	io.openems.edge.evcs.api;version=snapshot,\

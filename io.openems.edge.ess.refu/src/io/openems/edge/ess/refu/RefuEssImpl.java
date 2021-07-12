@@ -76,8 +76,6 @@ public class RefuEssImpl extends AbstractOpenemsModbusComponent implements RefuE
 	@Reference
 	protected ConfigurationAdmin cm;
 
-//	private final ErrorHandler errorHandler;
-
 	private Config config = null;
 
 	@Reference(policy = ReferencePolicy.STATIC, policyOption = ReferencePolicyOption.GREEDY, cardinality = ReferenceCardinality.MANDATORY)
@@ -96,8 +94,11 @@ public class RefuEssImpl extends AbstractOpenemsModbusComponent implements RefuE
 		);
 		this._setGridMode(GridMode.ON_GRID);
 		this._setMaxApparentPower(RefuEssImpl.MAX_APPARENT_POWER);
-//		this.errorHandler = new ErrorHandler(this);
 	}
+
+	// *************************************
+	// Overridden methods
+	// *************************************
 
 	@Activate
 	void activate(ComponentContext context, Config config) throws OpenemsException {
@@ -107,19 +108,6 @@ public class RefuEssImpl extends AbstractOpenemsModbusComponent implements RefuE
 			return;
 		}
 		this.operationalMode(this.config.operationState());
-	}
-
-	/**
-	 * This Method set the operational mode from the config
-	 * @param {@link SetOperationMode}
-	 */
-	private void operationalMode(SetOperationMode setOperationMode) {
-		EnumWriteChannel currentState = this.channel(RefuEss.ChannelId.SET_OPERATION_MODE);
-		try {
-			currentState.setNextWriteValue(setOperationMode);
-		} catch (OpenemsNamedException e) {
-			log.error("Enum write channel (SET_OPERATION_MODE) was not able to set");
-		}
 	}
 
 	@Deactivate
@@ -135,78 +123,8 @@ public class RefuEssImpl extends AbstractOpenemsModbusComponent implements RefuE
 		switch (event.getTopic()) {
 		case EdgeEventConstants.TOPIC_CYCLE_BEFORE_PROCESS_IMAGE:
 			this.handleEssState();
-//			this.errorHandler.run();
 			break;
 		}
-	}
-
-	private void handleEssState() {
-		switch (this.config.essState()) {
-		case DEFAULT:
-			this.handleStateMachine();
-			break;
-		case OFF:
-			this.setWorkingstate(StopStart.STOP);
-			break;
-		case ON:
-			this.setWorkingstate(StopStart.START);
-			break;
-		}
-
-	}
-
-	private void setWorkingstate(StopStart start) {
-
-		EnumWriteChannel currentState = this.channel(RefuEss.ChannelId.SET_WORK_STATE);
-		try {
-			currentState.setNextWriteValue(start);
-		} catch (OpenemsNamedException e) {
-			log.error("Enum write channel (SET_WORK_STATE) was not able to set");
-		}
-	}
-
-	private void handleStateMachine() {
-
-		switch (this.getSystemState()) {
-		case ERROR:
-			log.info("Error state");
-			this.setWorkingstate(StopStart.STOP);
-			break;
-		case OFF:
-			log.info("Off state");
-			this.setWorkingstate(StopStart.STOP);
-			break;
-			
-			
-		case INIT:
-			log.info("Init State");
-			this.setWorkingstate(StopStart.START);
-			break;
-		case OPERATION:
-			log.info("Operational state");
-			this.setWorkingstate(StopStart.START);
-			break;
-		case PRE_OPERATION:
-			log.info("Pre_Operational state");
-			this.setWorkingstate(StopStart.START);
-			break;
-		case STANDBY:
-			log.info("Stand-by state");
-			this.setWorkingstate(StopStart.START);
-			break;
-		case UNDEFINED:
-			log.info("Undefined state");
-			break;
-
-		}
-	}
-
-	private SystemState getSystemState() {
-		this.channel(RefuEss.ChannelId.SYSTEM_STATE);
-
-		EnumReadChannel currentState = this.channel(RefuEss.ChannelId.SYSTEM_STATE);
-		SystemState curState = currentState.value().asEnum();
-		return curState;
 	}
 
 	@Override
@@ -534,35 +452,6 @@ public class RefuEssImpl extends AbstractOpenemsModbusComponent implements RefuE
 		return 100;
 	}
 
-	public Constraint[] getStaticConstraints() throws OpenemsException {
-		SystemState systemState = this.channel(RefuEss.ChannelId.SYSTEM_STATE).value().asEnum();
-		switch (systemState) {
-		case ERROR:
-		case INIT:
-		case OFF:
-		case PRE_OPERATION:
-		case STANDBY:
-		case UNDEFINED:
-			return new Constraint[] {
-					this.power.createSimpleConstraint("Refu State: " + systemState, this, Phase.L1, Pwr.ACTIVE,
-							Relationship.EQUALS, 0),
-					this.power.createSimpleConstraint("Refu State: " + systemState, this, Phase.L2, Pwr.ACTIVE,
-							Relationship.EQUALS, 0),
-					this.power.createSimpleConstraint("Refu State: " + systemState, this, Phase.L3, Pwr.ACTIVE,
-							Relationship.EQUALS, 0),
-					this.power.createSimpleConstraint("Refu State: " + systemState, this, Phase.L3, Pwr.REACTIVE,
-							Relationship.EQUALS, 0),
-					this.power.createSimpleConstraint("Refu State: " + systemState, this, Phase.L3, Pwr.REACTIVE,
-							Relationship.EQUALS, 0),
-					this.power.createSimpleConstraint("Refu State: " + systemState, this, Phase.L3, Pwr.REACTIVE,
-							Relationship.EQUALS, 0) };
-
-		case OPERATION:
-			break;
-		}
-		return Power.NO_CONSTRAINTS;
-	}
-
 	@Override
 	public void applyPower(int activePowerL1, int reactivePowerL1, int activePowerL2, int reactivePowerL2,
 			int activePowerL3, int reactivePowerL3) throws OpenemsNamedException {
@@ -591,6 +480,136 @@ public class RefuEssImpl extends AbstractOpenemsModbusComponent implements RefuE
 		this.getSetReactivePowerL1Channel().setNextWriteValue(reactivePowerL1);
 		this.getSetReactivePowerL2Channel().setNextWriteValue(reactivePowerL2);
 		this.getSetReactivePowerL3Channel().setNextWriteValue(reactivePowerL3);
+	}
+
+	// *************************
+	// Helper methods
+	// *************************
+
+	/**
+	 * This Method set the operational mode from the config
+	 * 
+	 * @param {@link SetOperationMode}
+	 */
+	private void operationalMode(SetOperationMode setOperationMode) {
+		EnumWriteChannel currentState = this.channel(RefuEss.ChannelId.SET_OPERATION_MODE);
+		try {
+			currentState.setNextWriteValue(setOperationMode);
+		} catch (OpenemsNamedException e) {
+			log.error("Enum write channel (SET_OPERATION_MODE) was not able to set");
+		}
+	}
+
+	/**
+	 * Handle state machine based on the input from the config
+	 */
+	private void handleEssState() {
+		switch (this.config.essState()) {
+		case DEFAULT:
+			this.handleStateMachine();
+			break;
+		case OFF:
+			this.setWorkingstate(StopStart.STOP);
+			break;
+		case ON:
+			this.setWorkingstate(StopStart.START);
+			break;
+		}
+	}
+
+	/**
+	 * This method sets the workstate to start or stop
+	 * 
+	 * @param {{@link {@link StopStart}}}
+	 */
+	private void setWorkingstate(StopStart start) {
+
+		EnumWriteChannel currentState = this.channel(RefuEss.ChannelId.SET_WORK_STATE);
+		try {
+			currentState.setNextWriteValue(start);
+		} catch (OpenemsNamedException e) {
+			log.error("Enum write channel (SET_WORK_STATE) was not able to set");
+		}
+	}
+
+	/**
+	 * Method to handle the state machine of the ess inverter
+	 */
+	private void handleStateMachine() {
+
+		switch (this.getSystemState()) {
+		case ERROR:
+			log.info("Error state");
+			this.setWorkingstate(StopStart.STOP);
+			break;
+		case OFF:
+			log.info("Off state");
+			this.setWorkingstate(StopStart.STOP);
+			break;
+
+		case INIT:
+			log.info("Init State");
+			this.setWorkingstate(StopStart.START);
+			break;
+		case OPERATION:
+			log.info("Operational state");
+			this.setWorkingstate(StopStart.START);
+			break;
+		case PRE_OPERATION:
+			log.info("Pre_Operational state");
+			this.setWorkingstate(StopStart.START);
+			break;
+		case STANDBY:
+			log.info("Stand-by state");
+			this.setWorkingstate(StopStart.START);
+			break;
+		case UNDEFINED:
+			log.info("Undefined state");
+			break;
+
+		}
+	}
+
+	/**
+	 * This method gets the state of the system {@link SystemState}
+	 * 
+	 * @return
+	 */
+	private SystemState getSystemState() {
+		this.channel(RefuEss.ChannelId.SYSTEM_STATE);
+
+		EnumReadChannel currentState = this.channel(RefuEss.ChannelId.SYSTEM_STATE);
+		SystemState curState = currentState.value().asEnum();
+		return curState;
+	}
+
+	public Constraint[] getStaticConstraints() throws OpenemsException {
+		SystemState systemState = this.channel(RefuEss.ChannelId.SYSTEM_STATE).value().asEnum();
+		switch (systemState) {
+		case ERROR:
+		case INIT:
+		case OFF:
+		case PRE_OPERATION:
+		case STANDBY:
+		case UNDEFINED:
+			return new Constraint[] {
+					this.power.createSimpleConstraint("Refu State: " + systemState, this, Phase.L1, Pwr.ACTIVE,
+							Relationship.EQUALS, 0),
+					this.power.createSimpleConstraint("Refu State: " + systemState, this, Phase.L2, Pwr.ACTIVE,
+							Relationship.EQUALS, 0),
+					this.power.createSimpleConstraint("Refu State: " + systemState, this, Phase.L3, Pwr.ACTIVE,
+							Relationship.EQUALS, 0),
+					this.power.createSimpleConstraint("Refu State: " + systemState, this, Phase.L3, Pwr.REACTIVE,
+							Relationship.EQUALS, 0),
+					this.power.createSimpleConstraint("Refu State: " + systemState, this, Phase.L3, Pwr.REACTIVE,
+							Relationship.EQUALS, 0),
+					this.power.createSimpleConstraint("Refu State: " + systemState, this, Phase.L3, Pwr.REACTIVE,
+							Relationship.EQUALS, 0) };
+
+		case OPERATION:
+			break;
+		}
+		return Power.NO_CONSTRAINTS;
 	}
 
 	private IntegerWriteChannel getSetActivePowerL1Channel() {
