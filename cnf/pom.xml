@@ -42,40 +42,21 @@
 			<version>1.0.1</version>
 		</dependency>
 		<dependency>
-			<!-- Used by org.influxdb: influxdb-java -->
-			<groupId>com.squareup.moshi</groupId>
-			<artifactId>moshi</artifactId>
-			<version>1.12.0</version>
+			<!-- InfluxDB 2.0 Java Client -->
+			<groupId>com.influxdb</groupId>
+			<artifactId>influxdb-client-java</artifactId>
+			<version>3.1.0</version>
 		</dependency>
 		<dependency>
-			<!-- Used by org.influxdb: influxdb-java -->
-			<groupId>com.squareup.okhttp3</groupId>
-			<artifactId>logging-interceptor</artifactId>
-			<version>3.14.9</version>
+			<!-- InfluxDB 2.0 Core -->
+			<groupId>com.influxdb</groupId>
+			<artifactId>influxdb-client-core</artifactId>
+			<version>3.1.0</version>
 		</dependency>
 		<dependency>
-			<!-- Used by org.influxdb: influxdb-java -->
 			<groupId>com.squareup.okhttp3</groupId>
 			<artifactId>okhttp</artifactId>
-			<version>3.14.9</version>
-		</dependency>
-		<dependency>
-			<!-- Used by com.squareup.okhttp3: okhttp -->
-			<groupId>com.squareup.okio</groupId>
-			<artifactId>okio</artifactId>
-			<version>1.17.2</version>
-		</dependency>
-		<dependency>
-			<!-- Used by org.influxdb: influxdb-java -->
-			<groupId>com.squareup.retrofit2</groupId>
-			<artifactId>converter-moshi</artifactId>
-			<version>2.9.0</version>
-		</dependency>
-		<dependency>
-			<!-- Used by org.influxdb: influxdb-java -->
-			<groupId>com.squareup.retrofit2</groupId>
-			<artifactId>retrofit</artifactId>
-			<version>2.9.0</version>
+			<version>4.9.1</version>
 		</dependency>
 		<dependency>
 			<!-- HikariCP A solid, high-performance, JDBC connection pool at last. -->
@@ -212,11 +193,6 @@
 			<groupId>org.eclipse.platform</groupId>
 			<artifactId>org.eclipse.osgi</artifactId>
 			<version>3.16.300</version>
-		</dependency>
-		<dependency>
-			<groupId>org.influxdb</groupId>
-			<artifactId>influxdb-java</artifactId>
-			<version>2.17</version>
 		</dependency>
 		<dependency>
 			<groupId>org.java-websocket</groupId>

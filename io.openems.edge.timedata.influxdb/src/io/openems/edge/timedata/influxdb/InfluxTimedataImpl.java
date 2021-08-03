@@ -10,8 +10,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import org.influxdb.dto.Point;
-import org.influxdb.dto.Point.Builder;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -26,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonElement;
+import com.influxdb.client.write.Point;
 
 import io.openems.common.exceptions.OpenemsError.OpenemsNamedException;
 import io.openems.common.exceptions.OpenemsException;
@@ -75,10 +74,10 @@ public class InfluxTimedataImpl extends AbstractOpenemsComponent
 		this.influxConnector = new InfluxConnector(config.ip(), config.port(), config.username(), config.password(),
 				config.database(), config.retentionPolicy(), config.isReadOnly(), //
 				(failedPoints, throwable) -> {
-					String pointsString = StreamSupport.stream(failedPoints.spliterator(), false)
-							.map(Point::lineProtocol).collect(Collectors.joining(","));
-					this.logError(this.log, "Unable to write to InfluxDB: " + throwable.getMessage() + " for "
-							+ StringUtils.toShortString(pointsString, 100));
+//					String pointsString = StreamSupport.stream(failedPoints.spliterator(), false)
+//							.map(Point::lineProtocol).collect(Collectors.joining(","));
+//					this.logError(this.log, "Unable to write to InfluxDB: " + throwable.getMessage() + " for "
+//							+ StringUtils.toShortString(pointsString, 100));
 				});
 		this.config = config;
 	}
@@ -108,7 +107,7 @@ public class InfluxTimedataImpl extends AbstractOpenemsComponent
 
 		if (++this.cycleCount >= this.config.noOfCycles()) {
 			this.cycleCount = 0;
-			final Builder point = Point.measurement(InfluxConnector.MEASUREMENT).time(timestamp, TimeUnit.SECONDS);
+//			final Builder point = Point.measurement(InfluxConnector.MEASUREMENT).time(timestamp, TimeUnit.SECONDS);
 			final AtomicBoolean addedAtLeastOneChannelValue = new AtomicBoolean(false);
 
 			this.componentManager.getEnabledComponents().stream().filter(c -> c.isEnabled()).forEach(component -> {
@@ -130,29 +129,29 @@ public class InfluxTimedataImpl extends AbstractOpenemsComponent
 					Object value = valueOpt.get();
 					String address = channel.address().toString();
 					try {
-						switch (channel.getType()) {
-						case BOOLEAN:
-							point.addField(address, ((Boolean) value ? 1 : 0));
-							break;
-						case SHORT:
-							point.addField(address, (Short) value);
-							break;
-						case INTEGER:
-							point.addField(address, (Integer) value);
-							break;
-						case LONG:
-							point.addField(address, (Long) value);
-							break;
-						case FLOAT:
-							point.addField(address, (Float) value);
-							break;
-						case DOUBLE:
-							point.addField(address, (Double) value);
-							break;
-						case STRING:
-							point.addField(address, (String) value);
-							break;
-						}
+//						switch (channel.getType()) {
+//						case BOOLEAN:
+//							point.addField(address, ((Boolean) value ? 1 : 0));
+//							break;
+//						case SHORT:
+//							point.addField(address, (Short) value);
+//							break;
+//						case INTEGER:
+//							point.addField(address, (Integer) value);
+//							break;
+//						case LONG:
+//							point.addField(address, (Long) value);
+//							break;
+//						case FLOAT:
+//							point.addField(address, (Float) value);
+//							break;
+//						case DOUBLE:
+//							point.addField(address, (Double) value);
+//							break;
+//						case STRING:
+//							point.addField(address, (String) value);
+//							break;
+//						}
 					} catch (IllegalArgumentException e) {
 						this.log.warn(
 								"Unable to add Channel [" + address + "] value [" + value + "]: " + e.getMessage());
@@ -163,11 +162,11 @@ public class InfluxTimedataImpl extends AbstractOpenemsComponent
 			});
 
 			if (addedAtLeastOneChannelValue.get()) {
-				try {
-					this.influxConnector.write(point.build());
-				} catch (OpenemsException e) {
-					this.logError(this.log, e.getMessage());
-				}
+//				try {
+//					this.influxConnector.write(point.build());
+//				} catch (OpenemsException e) {
+//					this.logError(this.log, e.getMessage());
+//				}
 			}
 
 		}

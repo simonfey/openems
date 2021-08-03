@@ -8,14 +8,9 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
-import java.util.concurrent.TimeUnit;
-import java.util.function.BiConsumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.influxdb.InfluxDBException.FieldTypeConflictException;
-import org.influxdb.dto.Point;
-import org.influxdb.dto.Point.Builder;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
@@ -40,9 +35,7 @@ import io.openems.common.exceptions.OpenemsException;
 import io.openems.common.types.ChannelAddress;
 import io.openems.common.types.EdgeConfig;
 import io.openems.common.types.SemanticVersion;
-import io.openems.common.utils.StringUtils;
 import io.openems.shared.influxdb.InfluxConnector;
-import io.openems.shared.influxdb.InfluxConstants;
 
 @Designate(ocd = Config.class, factory = false)
 @Component(//
@@ -83,14 +76,14 @@ public class Influx extends AbstractOpenemsBackendComponent implements Timedata 
 		this.influxConnector = new InfluxConnector(config.url(), config.port(), config.username(), config.password(),
 				config.database(), config.retentionPolicy(), config.isReadOnly(), //
 				(failedPoints, throwable) -> {
-					if (throwable instanceof FieldTypeConflictException) {
-						this.fieldTypeConflictHandler.handleException((FieldTypeConflictException) throwable);
-					} else {
-						this.logError(this.log,
-								"Unable to write to InfluxDB. " + throwable.getClass().getSimpleName() + ": "
-										+ throwable.getMessage() + " for "
-										+ StringUtils.toShortString(failedPoints.toString(), 100));
-					}
+//					if (throwable instanceof FieldTypeConflictException) {
+//						this.fieldTypeConflictHandler.handleException((FieldTypeConflictException) throwable);
+//					} else {
+//						this.logError(this.log,
+//								"Unable to write to InfluxDB. " + throwable.getClass().getSimpleName() + ": "
+//										+ throwable.getMessage() + " for "
+//										+ StringUtils.toShortString(failedPoints.toString(), 100));
+//					}
 				});
 	}
 
@@ -146,16 +139,16 @@ public class Influx extends AbstractOpenemsBackendComponent implements Timedata 
 
 			Long timestamp = dataEntry.getKey();
 			// this builds an InfluxDB record ("point") for a given timestamp
-			Point.Builder builder = Point //
-					.measurement(InfluxConnector.MEASUREMENT) //
-					.tag(InfluxConstants.TAG, String.valueOf(influxEdgeId)) //
-					.time(timestamp, TimeUnit.MILLISECONDS);
-			for (Entry<ChannelAddress, JsonElement> channelEntry : channelEntries) {
-				this.addValue(builder, channelEntry.getKey().toString(), channelEntry.getValue());
-			}
-			if (builder.hasFields()) {
-				this.influxConnector.write(builder.build());
-			}
+//			Point.Builder builder = Point //
+//					.measurement(InfluxConnector.MEASUREMENT) //
+//					.tag(InfluxConstants.TAG, String.valueOf(influxEdgeId)) //
+//					.time(timestamp, TimeUnit.MILLISECONDS);
+//			for (Entry<ChannelAddress, JsonElement> channelEntry : channelEntries) {
+//				this.addValue(builder, channelEntry.getKey().toString(), channelEntry.getValue());
+//			}
+//			if (builder.hasFields()) {
+//				this.influxConnector.write(builder.build());
+//			}
 		}
 	}
 
@@ -208,38 +201,38 @@ public class Influx extends AbstractOpenemsBackendComponent implements Timedata 
 	 * @param element the value
 	 * @return
 	 */
-	private void addValue(Builder builder, String field, JsonElement element) {
-		if (element == null || element.isJsonNull()) {
-			// do not add
-			return;
-		}
-		if (this.specialCaseFieldHandling(builder, field, element)) {
-			// already handled by special case handling
-			return;
-		}
-		if (element.isJsonPrimitive()) {
-			JsonPrimitive value = element.getAsJsonPrimitive();
-			if (value.isNumber()) {
-				try {
-					builder.addField(field, Long.parseLong(value.toString()));
-				} catch (NumberFormatException e1) {
-					try {
-						builder.addField(field, Double.parseDouble(value.toString()));
-					} catch (NumberFormatException e2) {
-						builder.addField(field, value.getAsNumber());
-					}
-				}
-			} else if (value.isBoolean()) {
-				builder.addField(field, value.getAsBoolean());
-			} else if (value.isString()) {
-				builder.addField(field, value.getAsString());
-			} else {
-				builder.addField(field, value.toString());
-			}
-		} else {
-			builder.addField(field, element.toString());
-		}
-	}
+//	private void addValue(Builder builder, String field, JsonElement element) {
+//		if (element == null || element.isJsonNull()) {
+//			// do not add
+//			return;
+//		}
+//		if (this.specialCaseFieldHandling(builder, field, element)) {
+//			// already handled by special case handling
+//			return;
+//		}
+//		if (element.isJsonPrimitive()) {
+//			JsonPrimitive value = element.getAsJsonPrimitive();
+//			if (value.isNumber()) {
+//				try {
+//					builder.addField(field, Long.parseLong(value.toString()));
+//				} catch (NumberFormatException e1) {
+//					try {
+//						builder.addField(field, Double.parseDouble(value.toString()));
+//					} catch (NumberFormatException e2) {
+//						builder.addField(field, value.getAsNumber());
+//					}
+//				}
+//			} else if (value.isBoolean()) {
+//				builder.addField(field, value.getAsBoolean());
+//			} else if (value.isString()) {
+//				builder.addField(field, value.getAsString());
+//			} else {
+//				builder.addField(field, value.toString());
+//			}
+//		} else {
+//			builder.addField(field, element.toString());
+//		}
+//	}
 
 	/**
 	 * Handles some special cases for fields.
@@ -253,16 +246,16 @@ public class Influx extends AbstractOpenemsBackendComponent implements Timedata 
 	 * @param value   the value, guaranteed to be not-null and not JsonNull.
 	 * @return true if field was handled; false otherwise
 	 */
-	private boolean specialCaseFieldHandling(Builder builder, String field, JsonElement value) {
-		BiConsumer<Builder, JsonElement> handler = this.fieldTypeConflictHandler.getHandler(field);
-		if (handler == null) {
-			// no special handling exists for this field
-			return false;
-		}
-		// call special handler
-		handler.accept(builder, value);
-		return true;
-	}
+//	private boolean specialCaseFieldHandling(Builder builder, String field, JsonElement value) {
+//		BiConsumer<Builder, JsonElement> handler = this.fieldTypeConflictHandler.getHandler(field);
+//		if (handler == null) {
+//			// no special handling exists for this field
+//			return false;
+//		}
+//		// call special handler
+//		handler.accept(builder, value);
+//		return true;
+//	}
 
 	@Override
 	public Optional<JsonElement> getChannelValue(String edgeId, ChannelAddress address) {

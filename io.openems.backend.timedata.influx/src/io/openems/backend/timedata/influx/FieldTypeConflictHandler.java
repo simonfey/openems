@@ -1,12 +1,7 @@
 package io.openems.backend.timedata.influx;
 
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.BiConsumer;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.influxdb.InfluxDBException.FieldTypeConflictException;
-import org.influxdb.dto.Point.Builder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +18,7 @@ public class FieldTypeConflictHandler {
 
 	private final Logger log = LoggerFactory.getLogger(FieldTypeConflictHandler.class);
 	private final Influx parent;
-	private final ConcurrentHashMap<String, BiConsumer<Builder, JsonElement>> specialCaseFieldHandlers = new ConcurrentHashMap<>();
+//	private final ConcurrentHashMap<String, BiConsumer<Builder, JsonElement>> specialCaseFieldHandlers = new ConcurrentHashMap<>();
 
 	public FieldTypeConflictHandler(Influx parent) {
 		this.parent = parent;
@@ -36,79 +31,79 @@ public class FieldTypeConflictHandler {
 	 * @param failedPoints the failed points
 	 * @param e            the {@link FieldTypeConflictException}
 	 */
-	public synchronized void handleException(FieldTypeConflictException e) {
-		Matcher matcher = FIELD_TYPE_CONFLICT_EXCEPTION_PATTERN.matcher(e.getMessage());
-		if (!matcher.find()) {
-			this.parent.logWarn(this.log, "Unable to add special field handler for message [" + e.getMessage() + "]");
-			return;
-		}
-		String field = matcher.group("channel");
-		String thisType = matcher.group("thisType");
-		String requiredType = matcher.group("requiredType");
-
-		if (this.specialCaseFieldHandlers.containsKey(field)) {
-			// Special handling had already been added.
-			return;
-		}
-
-		BiConsumer<Builder, JsonElement> handler = null;
-		switch (requiredType) {
-		case "string":
-			handler = (builder, jValue) -> {
-				String value = this.getAsFieldTypeString(jValue);
-				if (value != null) {
-					builder.addField(field, value);
-				}
-			};
-			break;
-
-		case "integer":
-			handler = (builder, jValue) -> {
-				try {
-					Number value = this.getAsFieldTypeNumber(jValue);
-					if (value != null) {
-						builder.addField(field, value);
-					}
-				} catch (NumberFormatException e1) {
-					try {
-						// Failed -> try conversion to float and then to int
-						Float value = this.getAsFieldTypeFloat(jValue);
-						if (value != null) {
-							builder.addField(field, Math.round(value));
-						}
-					} catch (NumberFormatException e2) {
-						this.parent.logWarn(this.log, "Unable to convert field [" + field + "] value [" + jValue
-								+ "] to integer: " + e2.getMessage());
-					}
-				}
-			};
-			break;
-
-		case "float":
-			handler = (builder, jValue) -> {
-				try {
-					Float value = this.getAsFieldTypeFloat(jValue);
-					if (value != null) {
-						builder.addField(field, value);
-					}
-				} catch (NumberFormatException e1) {
-					this.parent.logInfo(this.log, "Unable to convert field [" + field + "] value [" + jValue
-							+ "] to float: " + e1.getMessage());
-				}
-			};
-			break;
-		}
-
-		if (handler == null) {
-			this.parent.logWarn(this.log, "Unable to add special field handler for [" + field + "] from [" + thisType
-					+ "] to [" + requiredType + "]");
-			return;
-		} else {
-			this.parent.logInfo(this.log,
-					"Add special field handler for [" + field + "] from [" + thisType + "] to [" + requiredType + "]");
-			this.specialCaseFieldHandlers.put(field, handler);
-		}
-	}
+//	public synchronized void handleException(FieldTypeConflictException e) {
+//		Matcher matcher = FIELD_TYPE_CONFLICT_EXCEPTION_PATTERN.matcher(e.getMessage());
+//		if (!matcher.find()) {
+//			this.parent.logWarn(this.log, "Unable to add special field handler for message [" + e.getMessage() + "]");
+//			return;
+//		}
+//		String field = matcher.group("channel");
+//		String thisType = matcher.group("thisType");
+//		String requiredType = matcher.group("requiredType");
+//
+//		if (this.specialCaseFieldHandlers.containsKey(field)) {
+//			// Special handling had already been added.
+//			return;
+//		}
+//
+//		BiConsumer<Builder, JsonElement> handler = null;
+//		switch (requiredType) {
+//		case "string":
+//			handler = (builder, jValue) -> {
+//				String value = this.getAsFieldTypeString(jValue);
+//				if (value != null) {
+//					builder.addField(field, value);
+//				}
+//			};
+//			break;
+//
+//		case "integer":
+//			handler = (builder, jValue) -> {
+//				try {
+//					Number value = this.getAsFieldTypeNumber(jValue);
+//					if (value != null) {
+//						builder.addField(field, value);
+//					}
+//				} catch (NumberFormatException e1) {
+//					try {
+//						// Failed -> try conversion to float and then to int
+//						Float value = this.getAsFieldTypeFloat(jValue);
+//						if (value != null) {
+//							builder.addField(field, Math.round(value));
+//						}
+//					} catch (NumberFormatException e2) {
+//						this.parent.logWarn(this.log, "Unable to convert field [" + field + "] value [" + jValue
+//								+ "] to integer: " + e2.getMessage());
+//					}
+//				}
+//			};
+//			break;
+//
+//		case "float":
+//			handler = (builder, jValue) -> {
+//				try {
+//					Float value = this.getAsFieldTypeFloat(jValue);
+//					if (value != null) {
+//						builder.addField(field, value);
+//					}
+//				} catch (NumberFormatException e1) {
+//					this.parent.logInfo(this.log, "Unable to convert field [" + field + "] value [" + jValue
+//							+ "] to float: " + e1.getMessage());
+//				}
+//			};
+//			break;
+//		}
+//
+//		if (handler == null) {
+//			this.parent.logWarn(this.log, "Unable to add special field handler for [" + field + "] from [" + thisType
+//					+ "] to [" + requiredType + "]");
+//			return;
+//		} else {
+//			this.parent.logInfo(this.log,
+//					"Add special field handler for [" + field + "] from [" + thisType + "] to [" + requiredType + "]");
+//			this.specialCaseFieldHandlers.put(field, handler);
+//		}
+//	}
 
 	/**
 	 * Convert JsonElement to String
@@ -175,7 +170,7 @@ public class FieldTypeConflictHandler {
 	 * @param field the Field
 	 * @return the handler or null
 	 */
-	public BiConsumer<Builder, JsonElement> getHandler(String field) {
-		return this.specialCaseFieldHandlers.get(field);
-	}
+//	public BiConsumer<Builder, JsonElement> getHandler(String field) {
+//		return this.specialCaseFieldHandlers.get(field);
+//	}
 }
