@@ -1,6 +1,6 @@
 import { registerLocaleData } from '@angular/common';
 import localDE from '@angular/common/locales/de';
-import { LOCALE_ID, NgModule } from '@angular/core';
+import { LOCALE_ID, NgModule, APP_INITIALIZER } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouteReuseStrategy } from '@angular/router';
@@ -21,6 +21,11 @@ import { SharedModule } from './shared/shared.module';
 import { StatusSingleComponent } from './shared/status/single/status.component';
 import { Language } from './shared/translate/language';
 import { UserModule } from './user/user.module';
+import { AuthService } from './auth0/auth.service';
+
+export function onAppInit(authService: AuthService): () => Promise<any> {
+  return authService.initialize;
+}
 
 @NgModule({
   declarations: [
@@ -54,7 +59,14 @@ import { UserModule } from './user/user.module';
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     CookieService,
     // { provide: ErrorHandler, useExisting: Service },
-    { provide: LOCALE_ID, useValue: 'de' }
+    { provide: LOCALE_ID, useValue: 'de' },
+    AuthService,
+    {
+      provide: APP_INITIALIZER,
+      useFactory: onAppInit,
+      deps: [AuthService],
+      multi: true
+    }
   ],
   bootstrap: [AppComponent],
 })

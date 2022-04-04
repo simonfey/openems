@@ -7,6 +7,9 @@ import { environment } from 'src/environments';
 import { AuthenticateWithPasswordRequest } from '../shared/jsonrpc/request/authenticateWithPasswordRequest';
 import { Edge, Service, Utils, Websocket } from '../shared/shared';
 import { Role } from '../shared/type/role';
+import { AuthService } from '../auth0/auth.service';
+import { CookieService } from 'ngx-cookie-service';
+import { AuthenticateWithTokenRequest } from '../shared/jsonrpc/request/authenticateWithTokenRequest';
 
 @Component({
   selector: 'index',
@@ -42,6 +45,8 @@ export class IndexComponent {
     public utils: Utils,
     private router: Router,
     private route: ActivatedRoute,
+    private authService: AuthService,
+    private cookieService: CookieService,
   ) {
     service.metadata
       .pipe(
@@ -65,6 +70,14 @@ export class IndexComponent {
 
         this.updateFilteredEdges();
       })
+  }
+
+  ngOnInit() {
+    this.authService.isAuthenticated().then(authenticated => {
+      if (!authenticated) {
+        this.authService.login();
+      }
+    })
   }
 
   ionViewWillEnter() {
@@ -103,13 +116,21 @@ export class IndexComponent {
       .map(edgeId => allEdges[edgeId]);
   }
 
-  /**
-   * Login to OpenEMS Edge or Backend.
-   * 
-   * @param param data provided in login form
-   */
-  public doLogin(param: { username?: string, password: string }) {
-    this.websocket.login(new AuthenticateWithPasswordRequest(param));
+  public doLogin(): void {
+    this.authService.isAuthenticated().then(authenticated => {
+      if (authenticated) {
+        this.authService.getIdToken().then(idToken => {
+          if (this.websocket.status == 'waiting for credentials') {
+            this.websocket.login(new AuthenticateWithTokenRequest({ token: idToken.__raw }))
+          } else {
+            this.cookieService.set('token', idToken.__raw, { expires: 365, path: '/', sameSite: 'Strict' });
+          }
+          this.router.navigate(['/index']);
+        });
+      } else {
+        this.authService.login();
+      }
+    })
   }
 
   doInfinite(infiniteScroll) {

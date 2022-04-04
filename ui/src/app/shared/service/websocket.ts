@@ -21,6 +21,7 @@ import { LanguageTag } from '../translate/language';
 import { Role } from '../type/role';
 import { Service } from './service';
 import { WsData } from './wsdata';
+import { AuthService } from 'src/app/auth0/auth.service';
 
 @Injectable()
 export class Websocket {
@@ -41,13 +42,14 @@ export class Websocket {
     private translate: TranslateService,
     private cookieService: CookieService,
     private router: Router,
+    private authService: AuthService,
   ) {
     service.websocket = this;
 
     // try to auto connect using token or session_id
     setTimeout(() => {
       this.connect();
-    })
+    }, 2000)
   }
 
   /**
@@ -83,7 +85,7 @@ export class Websocket {
           } else {
             // No Token -> directly ask for Login credentials
             this.status = 'waiting for credentials';
-            this.router.navigate(['/index']);
+            //this.router.navigate(['/index']);
           }
         }
       },
@@ -203,6 +205,7 @@ export class Websocket {
     this.status = 'waiting for credentials';
     this.cookieService.delete('token');
     this.service.onLogout();
+    this.authService.logout();
   }
 
   /**

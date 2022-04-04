@@ -232,7 +232,7 @@ export class Service implements ErrorHandler {
   public onLogout() {
     this.currentEdge.next(null);
     this.metadata.next(null);
-    this.router.navigate(['/index']);
+    //this.router.navigate(['/index']);
   }
 
   /**
@@ -380,7 +380,7 @@ export class Service implements ErrorHandler {
    * Checks if this Edge is allowed to show kWh values
    */
   public isKwhAllowed(edge: Edge): boolean {
-    return false;
+    return true;
   }
 
   /**
